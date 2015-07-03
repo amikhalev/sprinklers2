@@ -1,0 +1,12 @@
+{
+  "name": "sprinklers2",
+  "version": "0.0.1",
+  "description": "A better sprinkler control program",
+  "local": true,
+  "dependencies": {
+    "later": "^1.1.6",
+    "lodash": "^3.10.0",
+    "nedb": "^1.1.2",
+    "pi-gpio": "0.0.7"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "sections": [
+    {
+      "name": "Front Yard 1",
+      "pin": 16
+    },
+    {
+      "name": "Front Yard 2",
+      "pin": 11
+    },
+    {
+      "name": "Front Yard 3",
+      "pin": 40
+    },
+    {
+      "name": "Back Yard 1",
+      "pin": 15
+    },
+    {
+      "name": "Back Yard 2",
+      "pin": 22
+    },
+    {
+      "name": "Garden",
+      "pin": 18
+    }
+  ],
+  "programs": [
+    {
+      "enabled": true,
+      "name": "Main",
+      "when": "at 8:00 am also at 8:00 pm",
+      "times": [
+        1200,
+        900,
+        300,
+        600,
+        600,
+        1200
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Test",
+      "when": "at 7:12 pm",
+      "times": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ]
+    }
+  ]
+}
