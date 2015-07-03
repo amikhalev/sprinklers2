@@ -1,34 +1,60 @@
 doctype html
 html(lang="en")
     head
-        title Sprinklers Control Panel
-        link(rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css")
+        meta(charset="utf-8")
+        meta(http-equiv="X-UA-Compatible" content="IE=edge")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
 
-        script(type="text/javascript" src="bower_components/jquery/dist/jquery.min.js")
-        script(type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js")
+        title Sprinklers Control Panel
+
+        link(rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css")
+        link(rel="stylesheet" type="text/css" href="style/app.css")
 
     body
-        div.container
-            h1 Sprinklers Control Panel
+        div.container.control-panel
+            h1.title Sprinklers Control Panel
+            div#alerts
             ul.list-group
                 li.list-group-item
                     h2 Run section
-                    form(action="/runFor" method="POST")
+                    form#run-section
                         div.form-group
                             label(for="section") Section:
-                            select.form-control(id="section" name="section")
+                            select#section.form-control
                                 each section, i in sections
                                     option(value=i) #{section.name}
                         div.form-group
                             label(for="time") Time (seconds):
-                            input.form-control(id="time" name="time" type="number" min="0" max="3600" value="600")
+                            input#time.form-control(type="number" min="0" max="3600")
                         button.btn.btn-default(type="submit") Run
                 li.list-group-item
                     h2 Run program
-                    form(action="/runProgram" method="POST")
+                    form#run-program
                         div.form-group
                             label(for="program") Program:
-                            select.form-control(id="program" name="program")
+                            select#program.form-control
                                 each program, i in programs
                                     option(value=i) #{program.name}
                         button.btn.btn-default(type="submit") Run
+                li.list-group-item
+                    h2 Programs
+                    table.table
+                        tr
+                            th Enabled
+                            th Name
+                            th Schedule
+                            th Times
+                        each program, i in programs
+                            tr
+                                td: input(type="checkbox" disabled checked=program.enabled)
+                                td #{program.name}
+                                td: code #{program.when}
+                                td: ol
+                                    each time, i in program.times
+                                        li #{time} s
+
+        //
+            Scripts placed at bottom for better load time
+        script(type="text/javascript" src="bower_components/jquery/dist/jquery.min.js")
+        script(type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js")
+        script(type="text/javascript" src="script/app.js")

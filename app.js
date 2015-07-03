@@ -45,15 +45,21 @@ app.get('/', function (req, res) {
 
 app.post('/runFor', function (req, res) {
   var section = sections[req.body.section];
-  var time = parseInt(req.body.time, 10);
+  var time = parseFloat(req.body.time);
+  if (!section) {
+    return res.status(400).end("Invalid section number");
+  }
+  if (isNaN(time)) {
+    return res.status(400).end("Invalid time");
+  }
   section.runFor(time);
-  res.redirect('/');
+  res.status(200).end();
 });
 
 app.post('/runProgram', function (req, res) {
   var program = programs[req.body.program];
   program.execute();
-  res.redirect('/');
+  res.status(200).end();
 });
 
 var PORT = process.env.PORT || config.server.port;
