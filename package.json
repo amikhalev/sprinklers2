@@ -2,13 +2,19 @@
   "name": "sprinklers2",
   "version": "0.0.1",
   "description": "A better sprinkler control program",
+  "repository": "https://github.com/amikhalev/sprinklers2.git",
+  "README": "A better sprinklers control program",
   "local": true,
   "dependencies": {
     "bluebird": "^2.9.30",
+    "body-parser": "^1.13.1",
+    "express": "^4.13.0",
+    "express-winston": "^0.3.1",
+    "jade": "^1.11.0",
     "later": "^1.1.6",
     "lodash": "^3.10.0",
     "nedb": "^1.1.2",
-    "pi-gpio": "0.0.7",
+    "pi-gpio": "amikhalev/pi-gpio",
     "winston": "^1.0.1"
   }
 }

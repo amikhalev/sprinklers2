@@ -1,0 +1,34 @@
+doctype html
+html(lang="en")
+    head
+        title Sprinklers Control Panel
+        link(rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css")
+
+        script(type="text/javascript" src="bower_components/jquery/dist/jquery.min.js")
+        script(type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js")
+
+    body
+        div.container
+            h1 Sprinklers Control Panel
+            ul.list-group
+                li.list-group-item
+                    h2 Run section
+                    form(action="/runFor" method="POST")
+                        div.form-group
+                            label(for="section") Section:
+                            select.form-control(id="section" name="section")
+                                each section, i in sections
+                                    option(value=i) #{section.name}
+                        div.form-group
+                            label(for="time") Time (seconds):
+                            input.form-control(id="time" name="time" type="number" min="0" max="3600" value="600")
+                        button.btn.btn-default(type="submit") Run
+                li.list-group-item
+                    h2 Run program
+                    form(action="/runProgram" method="POST")
+                        div.form-group
+                            label(for="program") Program:
+                            select.form-control(id="program" name="program")
+                                each program, i in programs
+                                    option(value=i) #{program.name}
+                        button.btn.btn-default(type="submit") Run
