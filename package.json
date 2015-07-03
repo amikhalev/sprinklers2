@@ -4,9 +4,11 @@
   "description": "A better sprinkler control program",
   "local": true,
   "dependencies": {
+    "bluebird": "^2.9.30",
     "later": "^1.1.6",
     "lodash": "^3.10.0",
     "nedb": "^1.1.2",
-    "pi-gpio": "0.0.7"
+    "pi-gpio": "0.0.7",
+    "winston": "^1.0.1"
   }
 }
