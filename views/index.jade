@@ -25,7 +25,7 @@ html(lang="en")
                                     option(value=i) #{section.name}
                         div.form-group
                             label(for="time") Time (seconds):
-                            input#time.form-control(type="number" min="0" max="3600")
+                            input#time.form-control(type="number" min="0" max="3600" required)
                         button.btn.btn-default(type="submit") Run
                 li.list-group-item
                     h2 Run program

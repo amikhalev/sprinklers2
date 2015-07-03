@@ -25,10 +25,6 @@ $('#run-section').submit(function () {
   var form = $(this);
   var section = form.find('#section');
   var time = form.find('#time').val();
-  if (isNaN(parseFloat(time))) {
-    addAlert('warning', 'Enter a valid time', true);
-    return false;
-  }
   $.ajax('/runFor', {
     method: 'POST',
     data: {
