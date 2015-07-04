@@ -21,10 +21,18 @@ function addAlert(type, message, timeout) {
   }
 }
 
-$('#run-section').submit(function () {
-  var form = $(this);
-  var section = form.find('#section');
-  var time = form.find('#time').val();
+var sectionStates = $('#section-states');
+sectionStates.find('.refresh').click(function () {
+  $.getJSON('/sections')
+    .done(function(json) {
+
+    })
+});
+
+var runSection = $('#run-section');
+runSection.submit(function () {
+  var section = runSection.find('#section');
+  var time = runSection.find('#time').val();
   $.ajax('/runFor', {
     method: 'POST',
     data: {
@@ -40,9 +48,9 @@ $('#run-section').submit(function () {
   return false;
 });
 
-$('#run-program').submit(function () {
-  var form = $(this);
-  var program = form.find('#program');
+var runProgram = $('#run-program');
+runProgram.submit(function () {
+  var program = runProgram.find('#program');
   $.ajax('/runProgram', {
     method: 'POST',
     data: {

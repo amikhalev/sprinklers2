@@ -6,6 +6,7 @@
   "README": "A better sprinklers control program",
   "local": true,
   "dependencies": {
+    "basic-auth": "^1.0.3",
     "bluebird": "^2.9.30",
     "body-parser": "^1.13.1",
     "express": "^4.13.0",

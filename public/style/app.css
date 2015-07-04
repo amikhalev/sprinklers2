@@ -9,3 +9,9 @@ body {
 .control-panel .title {
     text-align: center;
 }
+
+.section-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}

@@ -15,6 +15,11 @@ html(lang="en")
             h1.title Sprinklers Control Panel
             div#alerts
             ul.list-group
+                li.list-group-item#section-states
+                    h2 Section states &nbsp;
+                        button.btn.btn-default.refresh: span.glyphicon.glyphicon-refresh
+                    each section, i in sections
+                        button.btn.btn-default.section-btn(disabled) #{section.name}
                 li.list-group-item
                     h2 Run section
                     form#run-section

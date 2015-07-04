@@ -37,6 +37,8 @@ app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 app.use(require('body-parser').urlencoded({extended: true}));
 app.use(require('express-winston').logger(config.server.logger));
+app.use(require('./lib/auth')());
+
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
@@ -60,6 +62,18 @@ app.post('/runProgram', function (req, res) {
   var program = programs[req.body.program];
   program.execute();
   res.status(200).end();
+});
+
+app.get('/sections', function (req, res) {
+  Promise.map(sections, function (section) {
+    return section.getValue()
+      .then(function (value) {
+        section.value = value;
+        return section;
+      });
+  }).then(function (sections) {
+    res.send(sections);
+  });
 });
 
 var PORT = process.env.PORT || config.server.port;

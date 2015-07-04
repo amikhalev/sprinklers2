@@ -29,7 +29,7 @@
     {
       "enabled": true,
       "name": "Main",
-      "when": "at 8:00 am also at 8:00 pm",
+      "when": "at 8:00 am also at 9:01 pm also at 10:01 pm",
       "times": [
         1200,
         900,
@@ -51,6 +51,12 @@
         10,
         10
       ]
+    }
+  ],
+  "users": [
+    {
+      "name": "amikhalev",
+      "password": "kakashka"
     }
   ]
 }
