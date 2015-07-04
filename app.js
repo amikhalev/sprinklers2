@@ -77,11 +77,11 @@ app.get('/sections', function (req, res) {
 });
 
 var PORT = process.env.PORT || config.server.port;
-var server = app.listen(PORT, function () {
-  var host = server.address().address;
-  var port = server.address().port;
-  log.info('Sprinklers server listening at http://%s:%s', host, port);
-});
+//var server = app.listen(PORT, function () {
+//  var host = server.address().address;
+//  var port = server.address().port;
+//  log.info('Sprinklers server listening at http://%s:%s', host, port);
+//});
 
 process.on('SIGINT', function () {
   log.info('Cleaning up');
