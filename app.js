@@ -4,17 +4,17 @@ var express = require('express');
 var log = require('./lib/log')();
 
 var config = require('./lib/config');
-log.debug('config: %j', config, {});
+log.debug({config: config}, 'config');
 
 var Section = require('./lib/models/section');
 var Program = require('./lib/models/program');
 
 var sections = Section.list();
-log.debug('sections: %j', sections, {});
+log.debug({sections: sections}, 'sections');
 Program.sections = sections;
 
 var programs = Program.list();
-log.debug('programs: %j', programs, {});
+log.debug({programs: programs}, 'programs');
 
 log.info('Initializing sections');
 Promise.each(sections, function (section) {
@@ -36,7 +36,9 @@ var app = express();
 app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 app.use(require('body-parser').urlencoded({extended: true}));
-app.use(require('express-winston').logger(config.server.logger));
+var expressBunyan = require('express-bunyan-logger');
+app.use(expressBunyan(config.server.logger));
+app.use(expressBunyan.errorLogger(config.server.logger));
 app.use(require('./lib/auth')());
 
 app.use(express.static(__dirname + '/public'));
@@ -77,19 +79,23 @@ app.get('/sections', function (req, res) {
 });
 
 var PORT = process.env.PORT || config.server.port;
-//var server = app.listen(PORT, function () {
-//  var host = server.address().address;
-//  var port = server.address().port;
-//  log.info('Sprinklers server listening at http://%s:%s', host, port);
-//});
+var server = app.listen(PORT, function () {
+  var host = server.address().address;
+  var port = server.address().port;
+  log.info({address: server.address()}, 'Sprinklers server listening at http://%s:%s', host, port);
+});
 
 process.on('SIGINT', function () {
   log.info('Cleaning up');
-  return Promise.each(sections, function (section) {
+  return Promise.each(sections, function (section, i) {
     section.deinitialize();
   })
     .then(function () {
-      log.info('Finished cleaning up. Exiting...');
+      log.info('Finished cleaning up');
       process.exit(2);
     });
+});
+
+process.on('exit', function (code) {
+  log.info({code: code}, 'Exiting...');
 });

@@ -1,4 +1,7 @@
 /.idea
 /node_modules
-/public/bower_components
+/public
+/dist
+/app/bower_components
+.env.json
 *.log
