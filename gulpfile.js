@@ -4,10 +4,6 @@ var cache = require('gulp-cached');
 var remember = require('gulp-remember');
 var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
-var globby = require('globby');
-var through = require('through2');
-var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
 
 var browserify = require('browserify');
 var uglify = require('gulp-uglify');
@@ -22,10 +18,16 @@ var install = require('gulp-install');
 var gls = require('gulp-live-server');
 
 var del = require('del');
-var notifier = require('node-notifier');
 var _ = require('lodash');
+var notifier = require('node-notifier');
+var globby = require('globby');
+var through = require('through2');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
+var mkdirp = require('mkdirp');
 
-var env = _.defaultsDeep(process.env, require('./.env.json'));
+require('dotenv').load();
+var env = process.env;
 
 var paths = {
   scripts: [
@@ -82,7 +84,7 @@ gulp.task('scripts', function () {
 });
 
 gulp.task('scripts:watch', function () {
-  gulp.watch(paths.scripts, ['scripts']);
+  gulp.watch(paths.scripts, ['scripts', notify]);
 });
 
 gulp.task('less', function () {
@@ -102,7 +104,7 @@ gulp.task('less', function () {
 });
 
 gulp.task('less:watch', function () {
-  gulp.watch(paths.less, ['less']);
+  gulp.watch(paths.less, ['less', notify]);
 });
 
 gulp.task('fonts', function () {
@@ -132,7 +134,16 @@ gulp.task('dist:install', ['dist:copy'], function () {
     .pipe(install({production: true}));
 });
 
-gulp.task('dist', ['dist:copy', 'dist:install']);
+gulp.task('dist:logs', function (cb) {
+  mkdirp('dist/logs', cb);
+});
+
+gulp.task('dist:misc', function () {
+  return gulp.src('app/misc/**/{*,.*}')
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('dist', ['dist:copy', 'dist:install', 'dist:logs', 'dist:misc']);
 
 gulp.task('deploy', ['dist'], function () {
   return gulp.src('dist')
@@ -158,9 +169,16 @@ gulp.task('deploy', ['dist'], function () {
 
 gulp.task('watch', ['scripts:watch', 'less:watch', 'jshint:watch']);
 
+var server;
+
+function notify() {
+  gutil.log('notify');
+  server.notify.apply(server, arguments);
+}
+
 gulp.task('run', client.concat(['watch']), function () {
-  var server = gls.new(['app.js'], {env: {NODE_ENV: 'development'}});
-  server.start();
+  server = gls.new(['app.js'], {env: {NODE_ENV: 'development'}});
+  return server.start();
 });
 
 gulp.task('default', ['run']);

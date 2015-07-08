@@ -3,5 +3,5 @@
 /public
 /dist
 /app/bower_components
-.env.json
+.env
 *.log
