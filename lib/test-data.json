@@ -1,36 +1,36 @@
 {
-  "sections": [
+  'sections': [
     {
-      "name": "Front Yard 1",
-      "pin": 16
+      'name': 'Front Yard 1',
+      'pin': 16
     },
     {
-      "name": "Front Yard 2",
-      "pin": 11
+      'name': 'Front Yard 2',
+      'pin': 11
     },
     {
-      "name": "Front Yard 3",
-      "pin": 40
+      'name': 'Front Yard 3',
+      'pin': 40
     },
     {
-      "name": "Back Yard 1",
-      "pin": 15
+      'name': 'Back Yard 1',
+      'pin': 15
     },
     {
-      "name": "Back Yard 2",
-      "pin": 22
+      'name': 'Back Yard 2',
+      'pin': 22
     },
     {
-      "name": "Garden",
-      "pin": 18
+      'name': 'Garden',
+      'pin': 18
     }
   ],
-  "programs": [
+  'programs': [
     {
-      "enabled": true,
-      "name": "Main",
-      "when": "at 8:54 am also at 10:00 pm",
-      "times": [
+      'enabled': true,
+      'name': 'Main',
+      'when': 'at 8:54 am also at 10:00 pm',
+      'times': [
         1200,
         900,
         300,
@@ -40,10 +40,10 @@
       ]
     },
     {
-      "enabled": false,
-      "name": "Test",
-      "when": "at 7:12 pm",
-      "times": [
+      'enabled': false,
+      'name': 'Test',
+      'when': 'at 7:12 pm',
+      'times': [
         10,
         10,
         10,
@@ -53,10 +53,10 @@
       ]
     }
   ],
-  "users": [
+  'users': [
     {
-      "name": "amikhalev",
-      "password": "kakashka"
+      'name': 'amikhalev',
+      'password': 'kakashka'
     }
   ]
 }

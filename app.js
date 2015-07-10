@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 var express = require('express');
+var path = require('path');
 
 var log = require('./lib/log')();
 
@@ -33,38 +34,13 @@ Promise.each(sections, function (section) {
 
 var app = express();
 
-app.set('view engine', 'jade');
-app.set('views', __dirname + '/views');
 app.use(require('body-parser').urlencoded({extended: true}));
 var expressBunyan = require('express-bunyan-logger');
 app.use(expressBunyan(config.server.logger));
 app.use(expressBunyan.errorLogger(config.server.logger));
 app.use(require('./lib/auth')());
 
-app.use(express.static(__dirname + '/public'));
-
-app.get('/', function (req, res) {
-  res.render('index', {sections: sections, programs: programs});
-});
-
-app.post('/runFor', function (req, res) {
-  var section = sections[req.body.section];
-  var time = parseFloat(req.body.time);
-  if (!section) {
-    return res.status(400).end("Invalid section number");
-  }
-  if (isNaN(time)) {
-    return res.status(400).end("Invalid time");
-  }
-  section.runFor(time);
-  res.status(200).end();
-});
-
-app.post('/runProgram', function (req, res) {
-  var program = programs[req.body.program];
-  program.execute();
-  res.status(200).end();
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/sections', function (req, res) {
   Promise.map(sections, function (section) {
@@ -73,9 +49,30 @@ app.get('/sections', function (req, res) {
         section.value = value;
         return section;
       });
-  }).then(function (sections) {
-    res.send(sections);
-  });
+  }).bind(res).then(res.send);
+});
+
+app.post('/sections/:id/run', function (req, res) {
+  var section = sections[req.params.id];
+  var time = parseFloat(req.body.time);
+  if (!section) {
+    return res.status(400).end('Invalid section number');
+  }
+  if (isNaN(time)) {
+    return res.status(400).end('Invalid time');
+  }
+  section.runFor(time);
+  res.status(200).end();
+});
+
+app.get('/programs', function (req, res) {
+  res.send(programs);
+});
+
+app.post('/programs/:id/run', function (req, res) {
+  var program = programs[req.params.id];
+  program.execute();
+  res.status(200).end();
 });
 
 var PORT = process.env.PORT || config.server.port;
@@ -87,11 +84,12 @@ var server = app.listen(PORT, function () {
 
 process.on('SIGINT', function () {
   log.info('Cleaning up');
-  return Promise.each(sections, function (section, i) {
+  return Promise.each(sections, function (section) {
     section.deinitialize();
   })
     .then(function () {
       log.info('Finished cleaning up');
+      /*eslint no-process-exit: 0*/
       process.exit(2);
     });
 });

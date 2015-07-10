@@ -4,53 +4,62 @@ var cache = require('gulp-cached');
 var remember = require('gulp-remember');
 var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
+var rename = require('gulp-rename');
 
 var browserify = require('browserify');
+var watchify = require('watchify');
+var babelify = require('babelify');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
-var jshint = require('gulp-jshint');
+var eslint = require('gulp-eslint');
 
 var minifyCss = require('gulp-minify-css');
 var less = require('gulp-less-sourcemap');
+
+var jade = require('gulp-jade');
 
 var rsync = require('gulp-rsync');
 var install = require('gulp-install');
 var gls = require('gulp-live-server');
 
 var del = require('del');
-var _ = require('lodash');
 var notifier = require('node-notifier');
-var globby = require('globby');
-var through = require('through2');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var mkdirp = require('mkdirp');
+var glob = require('glob');
 
 require('dotenv').load();
 var env = process.env;
 
 var paths = {
   scripts: [
-    'app/script/**/*.js'
+    'app/scripts/**/**.{js,jsx}'
   ],
   less: [
     'app/less/**/*.less'
   ],
+  views: [
+    'app/views/**/*.jade'
+  ],
   fonts: [
     'app/bower_components/bootstrap/dist/fonts/*'
   ],
-  jshint: [
+  lint: [
     'app.js',
     'gulpfile.js',
     'lib/**/*.js',
-    'app/scripts/**/*.js'
+    'app/scripts/**/*.{js,jsx}'
   ],
   dist: [
     'app.js',
     'package.json',
-    'views/**/*',
-    'public/**/*',
+    'public/fonts/**/*',
+    'public/*.html',
     'lib/**/*'
+  ],
+  misc: [
+    'app/.env'
   ]
 };
 
@@ -58,34 +67,50 @@ gulp.task('clean', function (cb) {
   del(['public', 'dist'], cb);
 });
 
-gulp.task('scripts', function () {
-  var bifyStream = through();
-  bifyStream.pipe(source('all.min.js'))
+function scripts(b) {
+  return b
+    .bundle()
+    .on('error', function (err) {
+      gutil.log('[browserify] error:');
+      gutil.log(err.toString());
+      notifier.notify({
+        title: '[browserify] error',
+        message: err.toString()
+      });
+    })
+    .pipe(source('all.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(uglify())
-    .on('error', gutil.log)
     .pipe(sourcemaps.write())
-    .pipe(gulp.dest('public/script'));
-  globby(paths.scripts, function (err, entries) {
-    if (err) {
-      return bifyStream.emit('error', err);
-    }
-    var bify = browserify({
-      entries: entries,
-      debug: true,
-      transform: []
-    });
-    bify.bundle()
-      .on('error', gutil.log)
-      .pipe(bifyStream);
-  });
-  return bifyStream;
-});
+    .pipe(gulp.dest('public/scripts'));
+}
 
-gulp.task('scripts:watch', function () {
-  gulp.watch(paths.scripts, ['scripts', notify]);
+var scriptEntries = paths.scripts.map(function (pattern) {
+  return glob.sync(pattern);
+}).reduce(function (scs, sc) {
+  return scs.concat(sc);
+}, []);
+
+var bundler = browserify({
+  entries: scriptEntries,
+  debug: true
+}).transform(babelify);
+
+var watcher = watchify(bundler);
+watcher.on('update', function () {
+  gutil.log('[watchify] updating');
+  return scripts(watcher)
+    .on('end', function () {
+      notifier.notify({
+        title: '[watchify]',
+        message: 'updated scripts'
+      });
+    });
 });
+watcher.on('log', gutil.log);
+
+gulp.task('scripts', scripts.bind(null, bundler));
+gulp.task('scripts:watch', scripts.bind(null, watcher));
 
 gulp.task('less', function () {
   return gulp.src(paths.less)
@@ -96,15 +121,26 @@ gulp.task('less', function () {
       }
     }))
     .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(minifyCss())
     .pipe(remember('less'))
-    .pipe(concat('all.min.css'))
+    .pipe(concat('all.css'))
     .pipe(sourcemaps.write())
-    .pipe(gulp.dest('public/style'));
+    .pipe(gulp.dest('public/styles'));
 });
 
 gulp.task('less:watch', function () {
-  gulp.watch(paths.less, ['less', notify]);
+  gulp.watch(paths.less, ['less']);
+});
+
+gulp.task('views', function () {
+  gulp.src(paths.views)
+    //.pipe(cache('views'))
+    .pipe(jade())
+    //.pipe(remember('views'))
+    .pipe(gulp.dest('public/'));
+});
+
+gulp.task('views:watch', function () {
+  gulp.watch(paths.views, ['views']);
 });
 
 gulp.task('fonts', function () {
@@ -112,16 +148,31 @@ gulp.task('fonts', function () {
     .pipe(gulp.dest('public/fonts'));
 });
 
-gulp.task('jshint', function () {
-  return gulp.src(paths.jshint)
-    .pipe(jshint())
-    .pipe(jshint.reporter('jshint-stylish'));
+gulp.task('lint', function () {
+  return gulp.src(paths.lint)
+    .pipe(eslint())
+    .pipe(eslint.format());
 });
 
-var client = ['scripts', 'less', 'fonts', 'jshint'];
+gulp.task('lint:watch', function () {
+  gulp.watch(paths.lint, ['lint']);
+});
 
-gulp.task('jshint:watch', function () {
-  gulp.watch(paths.jshint, ['jshint']);
+var client = ['scripts', 'less', 'views', 'fonts', 'lint'];
+
+gulp.task('dist:scripts', function () {
+  return gulp.src('public/scripts/all.js')
+    .pipe(uglify())
+    .on('error', gutil.log)
+    .pipe(gulp.dest('dist/public/scripts'));
+});
+
+gulp.task('dist:less', function () {
+  return gulp.src('public/styles/all.css')
+    .pipe(minifyCss())
+    .on('error', gutil.log)
+    .pipe(rename('all.min.css'))
+    .pipe(gulp.dest('dist/public/styles'));
 });
 
 gulp.task('dist:copy', client, function () {
@@ -139,11 +190,11 @@ gulp.task('dist:logs', function (cb) {
 });
 
 gulp.task('dist:misc', function () {
-  return gulp.src('app/misc/**/{*,.*}')
+  return gulp.src(paths.misc)
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dist', ['dist:copy', 'dist:install', 'dist:logs', 'dist:misc']);
+gulp.task('dist', ['dist:copy', 'dist:scripts', 'dist:less', 'dist:install', 'dist:logs', 'dist:misc']);
 
 gulp.task('deploy', ['dist'], function () {
   return gulp.src('dist')
@@ -167,15 +218,9 @@ gulp.task('deploy', ['dist'], function () {
     });
 });
 
-gulp.task('watch', ['scripts:watch', 'less:watch', 'jshint:watch']);
+gulp.task('watch', ['scripts:watch', 'less:watch', 'views:watch', 'lint:watch']);
 
 var server;
-
-function notify() {
-  gutil.log('notify');
-  server.notify.apply(server, arguments);
-}
-
 gulp.task('run', client.concat(['watch']), function () {
   server = gls.new(['app.js'], {env: {NODE_ENV: 'development'}});
   return server.start();
