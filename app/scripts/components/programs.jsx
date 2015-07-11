@@ -15,7 +15,7 @@ export default class Program extends React.Component {
     $.getJSON('/programs')
       .success(programs => this.setState({programs}))
       .fail((xhr, state, error) => {
-        alerts.add('danger', `Error loading programs: ${error}`);
+        alerts.add('danger', `Failed to fetch programs: ${error}`);
       });
   }
 

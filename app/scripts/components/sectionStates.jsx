@@ -21,7 +21,7 @@ export default class SectionStates extends React.Component {
     $.getJSON('/sections')
       .success(sections => this.setState({sections}))
       .fail((xhr, state, error) => {
-        alerts.add('danger', `Error loading sections: ${error}`);
+        alerts.add('danger', `Failed to fetch sections: ${error}`);
       })
       .always(() => this.setState({ loading: false }));
   }

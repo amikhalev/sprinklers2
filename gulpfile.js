@@ -20,7 +20,6 @@ var jade = require('gulp-jade');
 
 var rsync = require('gulp-rsync');
 var install = require('gulp-install');
-var gls = require('gulp-live-server');
 
 var del = require('del');
 var notifier = require('node-notifier');
@@ -28,6 +27,7 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var mkdirp = require('mkdirp');
 var glob = require('glob');
+var spawn = require('child_process').spawn;
 
 require('dotenv').load();
 var env = process.env;
@@ -96,21 +96,23 @@ var bundler = browserify({
   debug: true
 }).transform(babelify);
 
-var watcher = watchify(bundler);
-watcher.on('update', function () {
-  gutil.log('[watchify] updating');
-  return scripts(watcher)
-    .on('end', function () {
-      notifier.notify({
-        title: '[watchify]',
-        message: 'updated scripts'
-      });
-    });
-});
-watcher.on('log', gutil.log);
 
 gulp.task('scripts', scripts.bind(null, bundler));
-gulp.task('scripts:watch', scripts.bind(null, watcher));
+gulp.task('scripts:watch', function () {
+  var watcher = watchify(bundler);
+  watcher.on('update', function () {
+    gutil.log('[watchify] updating');
+    return scripts(watcher)
+      .on('end', function () {
+        notifier.notify({
+          title: '[watchify]',
+          message: 'updated scripts'
+        });
+      });
+  });
+  watcher.on('log', gutil.log);
+  return scripts(watcher);
+});
 
 gulp.task('less', function () {
   return gulp.src(paths.less)
@@ -160,14 +162,14 @@ gulp.task('lint:watch', function () {
 
 var client = ['scripts', 'less', 'views', 'fonts', 'lint'];
 
-gulp.task('dist:scripts', function () {
+gulp.task('dist:scripts', ['scripts'], function () {
   return gulp.src('public/scripts/all.js')
     .pipe(uglify())
     .on('error', gutil.log)
     .pipe(gulp.dest('dist/public/scripts'));
 });
 
-gulp.task('dist:less', function () {
+gulp.task('dist:less', ['less'], function () {
   return gulp.src('public/styles/all.css')
     .pipe(minifyCss())
     .on('error', gutil.log)
@@ -175,7 +177,7 @@ gulp.task('dist:less', function () {
     .pipe(gulp.dest('dist/public/styles'));
 });
 
-gulp.task('dist:copy', client, function () {
+gulp.task('dist:copy', ['views', 'fonts'], function () {
   return gulp.src(paths.dist, {base: '.'})
     .pipe(gulp.dest('dist'));
 });
@@ -194,7 +196,7 @@ gulp.task('dist:misc', function () {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dist', ['dist:copy', 'dist:scripts', 'dist:less', 'dist:install', 'dist:logs', 'dist:misc']);
+gulp.task('dist', ['dist:copy', /*'dist:scripts',*/ 'dist:less', 'dist:install', 'dist:logs', 'dist:misc']);
 
 gulp.task('deploy', ['dist'], function () {
   return gulp.src('dist')
@@ -220,10 +222,11 @@ gulp.task('deploy', ['dist'], function () {
 
 gulp.task('watch', ['scripts:watch', 'less:watch', 'views:watch', 'lint:watch']);
 
-var server;
-gulp.task('run', client.concat(['watch']), function () {
-  server = gls.new(['app.js'], {env: {NODE_ENV: 'development'}});
-  return server.start();
+gulp.task('run', client.concat(['watch']), function (cb) {
+  var proc = spawn('npm', ['start'], {
+    stdio: 'inherit'
+  });
+  proc.on('exit', cb);
 });
 
 gulp.task('default', ['run']);

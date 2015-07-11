@@ -1,30 +1,28 @@
-var Promise = require('bluebird');
-var express = require('express');
-var path = require('path');
+import Promise from 'bluebird';
+import express from 'express';
+import path from 'path';
 
-var log = require('./lib/log')();
+const log = require('./lib/log')();
 
-var config = require('./lib/config');
-log.debug({config: config}, 'config');
+import config from './lib/config';
+log.debug({config}, 'config');
 
-var Section = require('./lib/models/section');
-var Program = require('./lib/models/program');
+import Section from './lib/models/section';
+import Program from './lib/models/program';
 
-var sections = Section.list();
-log.debug({sections: sections}, 'sections');
+let sections = Section.list();
+log.debug({sections}, 'sections');
 Program.sections = sections;
 
-var programs = Program.list();
-log.debug({programs: programs}, 'programs');
+let programs = Program.list();
+log.debug({programs}, 'programs');
 
 log.info('Initializing sections');
-Promise.each(sections, function (section) {
-  return section.initialize();
-})
-  .then(function () {
+Promise.each(sections, section => section.initialize())
+  .then(() => {
     log.info('Finished initializing sections');
 
-    programs.forEach(function (program) {
+    programs.forEach(program => {
       program.schedule();
       if (program.name === 'Test' && config.runTest) {
         program.execute();
@@ -32,29 +30,32 @@ Promise.each(sections, function (section) {
     });
   });
 
-var app = express();
+let app = express();
 
-app.use(require('body-parser').urlencoded({extended: true}));
-var expressBunyan = require('express-bunyan-logger');
+import bodyParser from 'body-parser';
+import expressBunyan from 'express-bunyan-logger';
+import auth from './lib/auth';
+
+app.use(bodyParser.json({extended: true}));
 app.use(expressBunyan(config.server.logger));
 app.use(expressBunyan.errorLogger(config.server.logger));
-app.use(require('./lib/auth')());
+app.use(auth());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/sections', function (req, res) {
-  Promise.map(sections, function (section) {
-    return section.getValue()
-      .then(function (value) {
-        section.value = value;
-        return section;
-      });
-  }).bind(res).then(res.send);
+app.get('/sections', (req, res) => {
+  Promise.map(sections, section => section.getValue()
+      .then(value => {
+        let data = section.data();
+        data.value = value;
+        return data;
+      })
+  ).then(section => res.send(section));
 });
 
-app.post('/sections/:id/run', function (req, res) {
-  var section = sections[req.params.id];
-  var time = parseFloat(req.body.time);
+app.post('/sections/:id/run', (req, res) => {
+  let section = sections[req.params.id];
+  const time = parseFloat(req.body.time);
   if (!section) {
     return res.status(400).end('Invalid section number');
   }
@@ -65,35 +66,35 @@ app.post('/sections/:id/run', function (req, res) {
   res.status(200).end();
 });
 
-app.get('/programs', function (req, res) {
-  res.send(programs);
+app.get('/programs', (req, res) => {
+  res.send(programs.map(program => program.data()));
 });
 
-app.post('/programs/:id/run', function (req, res) {
-  var program = programs[req.params.id];
+app.post('/programs/:id/run', (req, res) => {
+  let program = programs[req.params.id];
   program.execute();
   res.status(200).end();
 });
 
 var PORT = process.env.PORT || config.server.port;
-var server = app.listen(PORT, function () {
-  var host = server.address().address;
-  var port = server.address().port;
-  log.info({address: server.address()}, 'Sprinklers server listening at http://%s:%s', host, port);
+var server = app.listen(PORT, () => {
+  const host = server.address().address;
+  const port = server.address().port;
+  log.info({address: server.address()}, `Sprinklers server listening at http://${host}:${port}`);
 });
 
-process.on('SIGINT', function () {
+process.on('SIGINT', () => {
   log.info('Cleaning up');
-  return Promise.each(sections, function (section) {
-    section.deinitialize();
-  })
-    .then(function () {
+  return Promise.each(sections, section => section.deinitialize())
+    .then(() => {
       log.info('Finished cleaning up');
       /*eslint no-process-exit: 0*/
       process.exit(2);
     });
 });
 
-process.on('exit', function (code) {
-  log.info({code: code}, 'Exiting...');
+process.on('exit', (code) => {
+  log.info({ code }, 'Exiting...');
 });
+
+export default app;
