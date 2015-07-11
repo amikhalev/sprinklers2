@@ -24,7 +24,8 @@ export default class RunSectionForm extends React.Component {
     let time = this.refs.time.getValue();
     $.ajax(`/sections/${section}/run`, {
       method: 'POST',
-      data: {time}
+      data: {time},
+      processData: false
     })
       .done(() => {
         var sectionName = this.state.sections[section].name;
