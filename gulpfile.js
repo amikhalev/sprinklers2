@@ -12,6 +12,7 @@ var babelify = require('babelify');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var eslint = require('gulp-eslint');
+var babel = require('gulp-babel');
 
 var minifyCss = require('gulp-minify-css');
 var less = require('gulp-less-sourcemap');
@@ -52,14 +53,12 @@ var paths = {
     'app/scripts/**/*.{js,jsx}'
   ],
   dist: [
-    'app.js',
     'package.json',
     'public/fonts/**/*',
-    'public/*.html',
-    'lib/**/*'
+    'lib/**/*.json'
   ],
   misc: [
-    'app/.env'
+    'app/misc/**/{*,.*,*.*}'
   ]
 };
 
@@ -134,10 +133,12 @@ gulp.task('less:watch', function () {
 });
 
 gulp.task('views', function () {
-  gulp.src(paths.views)
-    //.pipe(cache('views'))
-    .pipe(jade())
-    //.pipe(remember('views'))
+  return gulp.src(paths.views)
+    .pipe(jade({
+      locals: {
+        dist: false
+      }
+    }))
     .pipe(gulp.dest('public/'));
 });
 
@@ -166,6 +167,7 @@ gulp.task('dist:scripts', ['scripts'], function () {
   return gulp.src('public/scripts/all.js')
     .pipe(uglify())
     .on('error', gutil.log)
+    .pipe(rename('all.min.js'))
     .pipe(gulp.dest('dist/public/scripts'));
 });
 
@@ -177,7 +179,25 @@ gulp.task('dist:less', ['less'], function () {
     .pipe(gulp.dest('dist/public/styles'));
 });
 
-gulp.task('dist:copy', ['views', 'fonts'], function () {
+gulp.task('dist:views', function () {
+  return gulp.src(paths.views)
+    .pipe(jade({
+      locals: {
+        dist: true
+      }
+    }))
+    .pipe(gulp.dest('dist/public/'));
+});
+
+gulp.task('dist:babel', function () {
+  return gulp.src(['app.js', 'lib/**/*.js'], {base: '.'})
+    .pipe(sourcemaps.init())
+    .pipe(babel())
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('dist:copy', ['fonts'], function () {
   return gulp.src(paths.dist, {base: '.'})
     .pipe(gulp.dest('dist'));
 });
@@ -196,7 +216,7 @@ gulp.task('dist:misc', function () {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dist', ['dist:copy', /*'dist:scripts',*/ 'dist:less', 'dist:install', 'dist:logs', 'dist:misc']);
+gulp.task('dist', ['dist:copy', 'dist:scripts', 'dist:less', 'dist:views', 'dist:babel', 'dist:install', 'dist:logs', 'dist:misc']);
 
 gulp.task('deploy', ['dist'], function () {
   return gulp.src('dist')

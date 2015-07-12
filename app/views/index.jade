@@ -5,10 +5,16 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible" content="IE=edge")
         meta(name="viewport" content="width=device-width, initial-scale=1")
         title Sprinklers Control Panel
-        link(rel="stylesheet" type="text/css" href="styles/all.css")
+        if dist
+            link(rel="stylesheet" type="text/css" href="styles/all.min.css")
+        else
+            link(rel="stylesheet" type="text/css" href="styles/all.css")
     body
         div#app.container.control-panel
         //
             Scripts placed at bottom for better load time
-        script(type="text/javascript" src="scripts/all.js")
+        if dist
+            script(type="text/javascript" src="scripts/all.min.js")
+        else
+            script(type="text/javascript" src="scripts/all.js")
              

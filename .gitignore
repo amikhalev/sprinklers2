@@ -3,5 +3,6 @@
 /public
 /dist
 /app/bower_components
-.env
+/.env
 *.log
+npm-debug*
