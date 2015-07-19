@@ -19,13 +19,6 @@ Promise.all([Section.list(), Program.list()])
       .then(() => {
         log.info('Finished initializing sections');
 
-        programs.forEach(program => {
-          program.schedule();
-          if (program.name === 'Test' && config.runTest) {
-            program.execute();
-          }
-        });
-
         process.on('SIGINT', () => {
           log.info('Cleaning up');
           return Promise.each(sections, section => section.deinitialize())
@@ -47,15 +40,22 @@ let app = express();
 import bodyParser from 'body-parser';
 import expressBunyan from 'express-bunyan-logger';
 import auth from './lib/auth';
+import {HttpError, syntaxErrorHandler} from './lib/errors';
 
-app.use(bodyParser.json({extended: true}));
 app.use(expressBunyan(config.server.logger));
-app.use(auth());
-
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/sections', require('./lib/routes/sections'));
-app.use('/programs', require('./lib/routes/programs'));
+app.use('/', auth());
+app.use('/api', auth());
+
+app.use('/api/sections', require('./lib/routes/sections'));
+app.use('/api/programs', require('./lib/routes/programs'));
+app.use('/api/sse', require('./lib/routes/sse').route);
+
+app.use(HttpError.handler);
+app.use(syntaxErrorHandler);
 
 var PORT = process.env.PORT || config.server.port;
 var server = app.listen(PORT, () => {

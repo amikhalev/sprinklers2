@@ -1,56 +1,29 @@
-import React from 'react';
-import $ from 'jquery';
-import {Table} from 'react-bootstrap';
-import alerts from '../alerts.js';
+import React, {PropTypes} from 'react';
+import {ListGroup, ListGroupItem} from 'react-bootstrap';
+import Program from './Program.jsx';
 
-export default class Program extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      programs: []
-    };
-  }
-
-  componentDidMount() {
-    $.getJSON('/programs')
-      .success(programs => this.setState({programs}))
-      .fail((xhr, state, error) => {
-        alerts.add('danger', `Failed to fetch programs: ${error}`);
-      });
-  }
+export default class Programs extends React.Component {
+  static propTypes = {
+    programs: PropTypes.array
+  };
+  static defaultProps = {
+    programs: []
+  };
 
   render() {
-    let programs = this.state.programs.map((program) => {
-      let times = program.times.map((time, i) => (
-        <li key={i}>{time} s</li>
-      ));
+    let programs = this.props.programs.map((program) => {
       return (
-        <tr key={program.name}>
-          <td>
-            <input checked={program.enabled} readOnly type='checkbox'/>
-          </td>
-          <td>{program.name}</td>
-          <td><code>{program.when}</code></td>
-          <td>
-            <ol>{times}</ol>
-          </td>
-        </tr>
+        <ListGroupItem key={program.name}>
+          <Program program={program}/>
+        </ListGroupItem>
       );
     });
     return (
       <div>
         <h2>Programs</h2>
-        <Table>
-          <thead>
-          <th>Enabled</th>
-          <th>Name</th>
-          <th>Schedule</th>
-          <th>Times</th>
-          </thead>
-          <tbody>
+        <ListGroup>
           {programs}
-          </tbody>
-        </Table>
+        </ListGroup>
       </div>
     );
   }

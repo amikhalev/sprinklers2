@@ -1,46 +1,25 @@
-import React from 'react';
-import $ from 'jquery';
+import React, {PropTypes} from 'react';
 import {Input, Button} from 'react-bootstrap';
-import alerts from '../alerts.js';
+import SectionStore from '../stores/SectionStore.js';
 
 export default class RunSectionForm extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      sections: []
-    };
-  }
+  static propTypes = {
+    sections: PropTypes.array
+  };
 
-  componentDidMount() {
-    $.getJSON('/sections')
-      .success(sections => this.setState({sections}))
-      .fail((xhr, status, error) => {
-        alerts.add('danger', `Failed to fetch sections: ${error}`);
-      });
-  }
+  static defaultProps = {
+    sections: []
+  };
 
   run(e) {
     let section = this.refs.section.getValue();
     let time = this.refs.time.getValue();
-    $.ajax(`/sections/${section}/run`, {
-      method: 'POST',
-      data: JSON.stringify({
-        time
-      }),
-      contentType: 'application/json'
-    })
-      .done(() => {
-        var sectionName = this.state.sections[section].name;
-        alerts.add('success', `Running section '${sectionName}' for ${time} seconds`, true);
-      })
-      .fail((xhr, status, error) => {
-        alerts.add('danger', `Failed to run section: ${error}`);
-      });
+    SectionStore.run(section, time);
     e.preventDefault();
   }
 
   render() {
-    let sections = this.state.sections.map((section, i) => (
+    let sections = this.props.sections.map((section, i) => (
       <option key={section.name} value={i}>{section.name}</option>
     ));
     return (

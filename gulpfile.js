@@ -90,10 +90,14 @@ var scriptEntries = paths.scripts.map(function (pattern) {
   return scs.concat(sc);
 }, []);
 
+var BABEL_OPTIONS = {
+  optional: ['es7.classProperties']
+};
+
 var bundler = browserify({
   entries: scriptEntries,
   debug: true
-}).transform(babelify);
+}).transform(babelify.configure(BABEL_OPTIONS));
 
 
 gulp.task('scripts', scripts.bind(null, bundler));
@@ -192,7 +196,7 @@ gulp.task('dist:views', function () {
 gulp.task('dist:babel', function () {
   return gulp.src(['app.js', 'lib/**/*.js'], {base: '.'})
     .pipe(sourcemaps.init())
-    .pipe(babel())
+    .pipe(babel(BABEL_OPTIONS))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('dist'));
 });

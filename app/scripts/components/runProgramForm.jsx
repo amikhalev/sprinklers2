@@ -1,41 +1,24 @@
-import React from 'react';
-import $ from 'jquery';
+import React, {PropTypes} from 'react';
 import {Input, Button} from 'react-bootstrap';
-import alerts from '../alerts.js';
+import ProgramStore from '../stores/ProgramStore.js';
 
 export default class RunProgramForm extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      programs: []
-    };
-  }
+  static propTypes = {
+    programs: PropTypes.array
+  };
 
-  componentDidMount() {
-    $.getJSON('/programs')
-      .success(programs => this.setState({programs}))
-      .fail((xhr, status, error) => {
-        alerts.add('danger', `Failed to fetch programs: ${error}`);
-      });
-  }
+  static defaultProps = {
+    programs: []
+  };
 
   run(e) {
     let program = this.refs.program.getValue();
-    $.ajax(`/programs/${program}/run`, {
-      method: 'POST'
-    })
-      .done(() => {
-        var programName = this.state.programs[program].name;
-        alerts.add('success', `Running program '${programName}'`, true);
-      })
-      .fail((xhr, status, error) => {
-        alerts.add('danger', `Failed to run program: ${error}`);
-      });
+    ProgramStore.run(program);
     e.preventDefault();
   }
 
   render() {
-    let programs = this.state.programs.map((program, i) => (
+    let programs = this.props.programs.map((program, i) => (
       <option key={program.name} value={i}>{program.name}</option>
     ));
     return (

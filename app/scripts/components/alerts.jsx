@@ -3,7 +3,7 @@ let update = React.addons.update;
 let CSSTransitionGroup = React.addons.CSSTransitionGroup;
 import {Alert} from 'react-bootstrap';
 
-import alerts from '../alerts.js';
+import alerts from '../services/alerts.js';
 
 export default class Alerts extends React.Component {
   constructor() {
