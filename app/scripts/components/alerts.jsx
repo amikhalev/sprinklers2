@@ -48,12 +48,14 @@ export default class Alerts extends React.Component {
     return id;
   }
 
+  renderAlert = alert => (
+    <Alert key={alert.id} bsStyle={alert.type} onDismiss={this.remove.bind(this, alert.id)}>
+      {alert.message}
+    </Alert>
+  );
+
   render() {
-    var alertElements = this.state.alerts.map(alert => (
-      <Alert key={alert.id} bsStyle={alert.type} onDismiss={this.remove.bind(this, alert.id)}>
-        {alert.message}
-      </Alert>
-    ));
+    var alertElements = this.state.alerts.map(this.renderAlert);
     return (
       <div className='alerts'>
         <CSSTransitionGroup transitionName='alerts'>

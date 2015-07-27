@@ -8,4 +8,8 @@ class AlertsService extends EventEmitter {
 
 const instance = new AlertsService();
 
+window.onerror = function(msg, url, line, col) {
+  instance.add('danger', `Uncaught Exception (${url}:${line}:${col}):\n${msg}`);
+};
+
 export default instance;

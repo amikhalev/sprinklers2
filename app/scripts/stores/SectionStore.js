@@ -5,8 +5,14 @@ import alerts from '../services/alerts.js';
 
 function errorHandler(message) {
   return (xhr) => {
-    let response = JSON.parse(xhr.responseText);
-    alerts.add('danger', `${message}: ${response.message}`);
+    let error;
+    if (xhr.status === 500) {
+      error = 'Internal Server Error';
+    } else {
+      let response = JSON.parse(xhr.responseText);
+      error = response.message;
+    }
+    alerts.add('danger', `${message}: ${error}`);
   };
 }
 

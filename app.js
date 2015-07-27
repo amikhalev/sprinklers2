@@ -7,8 +7,7 @@ const log = require('./lib/log')();
 import config from './lib/config';
 log.debug({config}, 'config');
 
-import Section from './lib/models/section';
-import Program from './lib/models/program';
+import {Section, Program} from './lib/models';
 
 Promise.all([Section.list(), Program.list()])
   .spread((sections, programs) => {

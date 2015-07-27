@@ -19,3 +19,17 @@ button > .right {
   top: 50%;
   transform: translateY(-50%);
 }
+
+.form-inline-header (@header-index) when (@header-index > 0) {
+  .form-inline > h@{header-index} {
+    display: inline-block;
+  }
+  .form-inline-header(@header-index - 1);
+}
+.form-inline-header(6);
+
+.list-group-item .btn.right {
+  position: absolute;
+  right: 15px;
+  top: 25px;
+}

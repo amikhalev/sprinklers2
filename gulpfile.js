@@ -46,6 +46,9 @@ var paths = {
   fonts: [
     'app/bower_components/bootstrap/dist/fonts/*'
   ],
+  images: [
+    'app/favicon.ico', 'app/images/**/*.*'
+  ],
   lint: [
     'app.js',
     'gulpfile.js',
@@ -55,6 +58,8 @@ var paths = {
   dist: [
     'package.json',
     'public/fonts/**/*',
+    'public/images/**/*',
+    'public/favicon.ico',
     'lib/**/*.json'
   ],
   misc: [
@@ -90,14 +95,11 @@ var scriptEntries = paths.scripts.map(function (pattern) {
   return scs.concat(sc);
 }, []);
 
-var BABEL_OPTIONS = {
-  optional: ['es7.classProperties']
-};
-
 var bundler = browserify({
   entries: scriptEntries,
-  debug: true
-}).transform(babelify.configure(BABEL_OPTIONS));
+  debug: true,
+  fullPaths: true
+}).transform(babelify);
 
 
 gulp.task('scripts', scripts.bind(null, bundler));
@@ -155,6 +157,11 @@ gulp.task('fonts', function () {
     .pipe(gulp.dest('public/fonts'));
 });
 
+gulp.task('images', function () {
+  return gulp.src(paths.images)
+    .pipe(gulp.dest('public'));
+});
+
 gulp.task('lint', function () {
   return gulp.src(paths.lint)
     .pipe(eslint())
@@ -196,7 +203,7 @@ gulp.task('dist:views', function () {
 gulp.task('dist:babel', function () {
   return gulp.src(['app.js', 'lib/**/*.js'], {base: '.'})
     .pipe(sourcemaps.init())
-    .pipe(babel(BABEL_OPTIONS))
+    .pipe(babel())
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('dist'));
 });
