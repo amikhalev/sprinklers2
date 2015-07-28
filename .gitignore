@@ -1,8 +1,0 @@
-/.idea
-/node_modules
-/public
-/dist
-/app/bower_components
-/.env
-*.log
-npm-debug*
