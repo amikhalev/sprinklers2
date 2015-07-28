@@ -39,7 +39,7 @@ let app = express();
 import bodyParser from 'body-parser';
 import expressBunyan from 'express-bunyan-logger';
 import auth from './lib/auth';
-import {HttpError, syntaxErrorHandler} from './lib/errors';
+import {HttpError, validationErrorHandler, syntaxErrorHandler} from './lib/errors';
 
 app.use(expressBunyan(config.server.logger));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -53,8 +53,9 @@ app.use('/api/sections', require('./lib/routes/sections'));
 app.use('/api/programs', require('./lib/routes/programs'));
 app.use('/api/sse', require('./lib/routes/sse').route);
 
-app.use(HttpError.handler);
+app.use(validationErrorHandler);
 app.use(syntaxErrorHandler);
+app.use(HttpError.handler);
 
 var PORT = process.env.PORT || config.server.port;
 var server = app.listen(PORT, () => {
