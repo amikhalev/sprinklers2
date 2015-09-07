@@ -1,0 +1,70 @@
+@import "../bower_components/bootstrap/less/bootstrap";
+
+@import "alerts.less";
+
+/* Space out content a bit */
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.header,
+.footer {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+@line-color: #9F9F9F;
+
+.header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid @line-color;
+  h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 40px;
+  }
+}
+
+.footer {
+  padding-top: 19px;
+  color: @text-muted;
+  border-top: 1px solid @line-color;
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 30px;
+  }
+}
+
+button > .right {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.list-group-item .btn.right {
+  position: absolute;
+  right: 15px;
+  top: 25px;
+}

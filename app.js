@@ -1,6 +1,4 @@
 import Promise from 'bluebird';
-import express from 'express';
-import path from 'path';
 
 const log = require('./lib/log')();
 
@@ -34,20 +32,22 @@ Promise.all([Section.list(), Program.list()])
       });
   });
 
-let app = express();
-
+import express from 'express';
 import bodyParser from 'body-parser';
 import expressBunyan from 'express-bunyan-logger';
-import auth from './lib/auth';
+//import auth from './lib/auth';
 import {HttpError, validationErrorHandler, syntaxErrorHandler} from './lib/errors';
+import {join} from 'path';
+
+const app = express();
 
 app.use(expressBunyan(config.server.logger));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(join(__dirname, 'public')));
 
-app.use('/', auth());
-app.use('/api', auth());
+//app.use('/', auth());
+//app.use('/api', auth());
 
 app.use('/api/sections', require('./lib/routes/sections'));
 app.use('/api/programs', require('./lib/routes/programs'));

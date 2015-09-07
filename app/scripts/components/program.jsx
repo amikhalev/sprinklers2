@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Input, Button, ButtonGroup, Glyphicon} from 'react-bootstrap';
+import ProgramStore from '../stores/ProgramStore.js';
 
 export default class Program extends React.Component {
   static propTypes = {
@@ -23,6 +24,10 @@ export default class Program extends React.Component {
     this.setState({
       editing: false
     });
+  };
+
+  handleScheduleChange = (event) => {
+    ProgramStore.setWhen(this.props.program.name, event.target.value);
   };
 
   renderTime = (time, i) => {
@@ -68,7 +73,7 @@ export default class Program extends React.Component {
           <Input checked={running} readOnly={!editing} label='Running' type='checkbox'/>&nbsp;
           {editBtn}
         </div>
-        <Input type='text' label='Schedule' value={when} readOnly={!editing}/>
+        <Input type='text' label='Schedule' value={when} readOnly={!editing} onChange={this.handleScheduleChange}/>
         <label>Times</label>
         <table className='table table-bordered'>
           <thead>

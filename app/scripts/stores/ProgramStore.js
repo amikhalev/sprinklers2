@@ -1,75 +1,58 @@
-import {EventEmitter} from 'events';
-import $ from 'jquery';
+import {createStore} from 'reflux';
+import {FetchApiMixin, StateMixin} from './StoreMixins.js';
+import ProgramActions from '../actions/ProgramActions.js';
+import {add as addAlert} from '../actions/AlertActions.js';
 import sse from '../services/sse.js';
-import alerts from '../services/alerts.js';
 
-function errorHandler(message) {
-  return (xhr) => {
-    let response = JSON.parse(xhr.responseText);
-    alerts.add('danger', `${message}: ${response.message}`);
-  };
-}
+export default createStore({
+  mixins: [FetchApiMixin, StateMixin],
+  isLoading: false,
+  programs: [],
 
-class ProgramStore extends EventEmitter {
-  constructor() {
-    super();
-    this.isLoading = false;
-    this.programs = [];
-    this._updatePrograms = this._updatePrograms.bind(this);
-    sse.on('programs', this._updatePrograms);
-  }
+  init () {
+    sse.on('programs', this.updatePrograms);
+    this.listenToMany(ProgramActions);
+  },
+
+  getState() {
+    return {
+      programs: this.programs
+    };
+  },
 
   load() {
-    this._startLoading();
-    $.getJSON('/api/programs')
-      .success(this._updatePrograms)
-      .fail(errorHandler('Failed to load programs'));
-  }
-
-  toggle(id) {
-    this._startLoading();
-    $.post(`/api/programs/${id}/toggle`, {
-      dataType: 'json'
-    })
-      .success(this._updatePrograms)
-      .fail(errorHandler('Failed to toggle programs'));
-  }
+    let {onSuccess, onError} = this.fetchHandlers({
+      errorMessage: 'Failed to load programs',
+      action: ProgramActions.load,
+      dataHandler: this.updatePrograms
+    });
+    fetch('/api/programs')
+      .then(onSuccess, onError);
+  },
 
   run(id) {
-    this._startLoading();
-    $.ajax(`/api/programs/${id}/run`, {
-      method: 'POST',
-      dataType: 'json'
+    let {onSuccess, onError} = this.fetchHandlers({
+      errorMessage: 'Failed to run program',
+      action: ProgramActions.run,
+      dataHandler: this.updatePrograms
+    });
+    fetch(`/api/programs/${id}/run`, {
+      method: 'POST'
     })
-      .success(data => {
-        alerts.add('success', data.message, true);
-        this._updatePrograms(data);
-      })
-      .fail(errorHandler('Failed to run program'));
-  }
+      .then(onSuccess)
+      .then(data => addAlert('success', data.message, true), onError);
+  },
 
-  _startLoading() {
-    this.isLoading = true;
-    this.emitChange();
-  }
+  updatePrograms(programs) {
+    this.programs = programs;
+    this.stateUpdated();
+  },
 
-  _updatePrograms(response) {
-    this.programs = response.data;
-    this.isLoading = false;
-    this.emitChange();
+  setWhen(name, when) {
+    let index = this.programs.findIndex(program => program.name === name);
+    this.programs[index].when = when;
+    this.stateUpdated();
   }
+});
 
-  emitChange() {
-    this.emit('change');
-  }
 
-  addChangeListener(listener) {
-    this.addListener('change', listener);
-  }
-
-  removeChangeListener(listener) {
-    this.removeListener('change', listener);
-  }
-}
-
-export default new ProgramStore();

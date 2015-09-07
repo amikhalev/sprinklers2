@@ -14,6 +14,4 @@ class SseService extends EventEmitter {
   }
 }
 
-const instance = new SseService();
-
-export default instance;
+export default new SseService();

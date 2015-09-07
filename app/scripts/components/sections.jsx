@@ -1,11 +1,11 @@
 import React, {PropTypes} from 'react';
 import {Button, ButtonGroup, Label, Glyphicon} from 'react-bootstrap';
-import SectionStore from '../stores/SectionStore.js';
+import {load, toggle} from '../actions/SectionActions.js';
 
 export default class Sections extends React.Component {
   static propTypes = {
     loading: PropTypes.bool,
-    sections: PropTypes.array
+    sections: PropTypes.array.isRequired
   };
 
   static defaultProps = {
@@ -22,22 +22,20 @@ export default class Sections extends React.Component {
 
   componentDidMount() {
     let msUntilNextSecond = 1000 - new Date().getMilliseconds();
-    setTimeout(() => {
+    this.timeout = setTimeout(() => {
+      this.timeout = null;
       this.tick();
       this.ticker = setInterval(this.tick.bind(this), 1000);
     }, msUntilNextSecond);
   }
 
-  componentDidUnmount() {
-    clearInterval(this.ticker);
-  }
-
-  load() {
-    SectionStore.load();
-  }
-
-  toggle(index) {
-    SectionStore.toggle(index);
+  componentWillUnmount() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+    if (this.ticker) {
+      clearInterval(this.ticker);
+    }
   }
 
   tick() {
@@ -59,7 +57,7 @@ export default class Sections extends React.Component {
     let pin = <Label>pin {section.pin}</Label>;
     return (
       <Button key={section.name} className={section.value ? 'active' : ''}
-              disabled={loading} onClick={this.toggle.bind(this, index)}>
+              disabled={loading} onClick={toggle.bind(this, index)}>
         {section.name}&nbsp;
         <div className='right'>{timeLeft}&nbsp;{pin}</div>
       </Button>
@@ -69,7 +67,7 @@ export default class Sections extends React.Component {
   render() {
     const {loading} = this.props;
     let refreshBtn = (
-      <Button disabled={loading} onClick={!loading ? this.load.bind(this) : null} ref='refresh'>
+      <Button disabled={loading} onClick={!loading ? load : null} ref='refresh'>
         {loading ? 'Loading...' : (<Glyphicon glyph='refresh'/>)}
       </Button>
     );

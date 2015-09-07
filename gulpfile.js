@@ -14,8 +14,8 @@ var concat = require('gulp-concat');
 var eslint = require('gulp-eslint');
 var babel = require('gulp-babel');
 
-var minifyCss = require('gulp-minify-css');
 var less = require('gulp-less-sourcemap');
+var minifyCss = require('gulp-minify-css');
 
 var jade = require('gulp-jade');
 
@@ -37,8 +37,8 @@ var paths = {
   scripts: [
     'app/scripts/**/**.{js,jsx}'
   ],
-  less: [
-    'app/less/**/*.less'
+  styles: [
+    'app/styles/app.less'
   ],
   views: [
     'app/views/**/*.jade'
@@ -119,23 +119,30 @@ gulp.task('scripts:watch', function () {
   return scripts(watcher);
 });
 
-gulp.task('less', function () {
-  return gulp.src(paths.less)
-    .pipe(cache('less'))
+gulp.task('styles', function () {
+  return gulp.src(paths.styles)
+    .pipe(cache('styles'))
+    .pipe(sourcemaps.init())
     .pipe(less({
       sourceMap: {
         sourceMapFileInline: true
       }
     }))
-    .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(remember('less'))
+    .on('error', function (error) {
+      gutil.log(gutil.colors.red(error.message));
+      notifier.notify({
+        title: 'Less compilation error',
+        message: error.message
+      });
+    })
+    .pipe(remember('styles'))
     .pipe(concat('all.css'))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('public/styles'));
 });
 
-gulp.task('less:watch', function () {
-  gulp.watch(paths.less, ['less']);
+gulp.task('styles:watch', function () {
+  gulp.watch(paths.styles, ['styles']);
 });
 
 gulp.task('views', function () {
@@ -165,14 +172,14 @@ gulp.task('images', function () {
 gulp.task('lint', function () {
   return gulp.src(paths.lint)
     .pipe(eslint())
-    .pipe(eslint.format());
+    .pipe(eslint.format('node_modules/eslint-friendly-formatter'));
 });
 
 gulp.task('lint:watch', function () {
   gulp.watch(paths.lint, ['lint']);
 });
 
-var client = ['scripts', 'less', 'views', 'fonts', 'lint'];
+var client = ['scripts', 'styles', 'views', 'fonts', 'lint'];
 
 gulp.task('dist:scripts', ['scripts'], function () {
   return gulp.src('public/scripts/all.js')
@@ -182,7 +189,7 @@ gulp.task('dist:scripts', ['scripts'], function () {
     .pipe(gulp.dest('dist/public/scripts'));
 });
 
-gulp.task('dist:less', ['less'], function () {
+gulp.task('dist:styles', ['styles'], function () {
   return gulp.src('public/styles/all.css')
     .pipe(minifyCss())
     .on('error', gutil.log)
@@ -227,7 +234,7 @@ gulp.task('dist:misc', function () {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dist', ['dist:copy', 'dist:scripts', 'dist:less', 'dist:views', 'dist:babel', 'dist:install', 'dist:logs', 'dist:misc']);
+gulp.task('dist', ['dist:copy', 'dist:scripts', 'dist:styles', 'dist:views', 'dist:babel', 'dist:install', 'dist:logs', 'dist:misc']);
 
 gulp.task('deploy', ['dist'], function () {
   return gulp.src('dist')
@@ -251,13 +258,13 @@ gulp.task('deploy', ['dist'], function () {
     });
 });
 
-gulp.task('watch', ['scripts:watch', 'less:watch', 'views:watch', 'lint:watch']);
+gulp.task('watch', ['scripts:watch', 'styles:watch', 'views:watch', 'lint:watch']);
 
-gulp.task('run', client.concat(['watch']), function (cb) {
+gulp.task('run', function (cb) {
   var proc = spawn('npm', ['start'], {
     stdio: 'inherit'
   });
   proc.on('exit', cb);
 });
 
-gulp.task('default', ['run']);
+gulp.task('default', ['run'].concat(client).concat(['watch']));

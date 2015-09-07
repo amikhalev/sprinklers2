@@ -1,85 +1,70 @@
-import {EventEmitter} from 'events';
-import $ from 'jquery';
+import {createStore} from 'reflux';
+import {FetchApiMixin, StateMixin} from './StoreMixins.js';
+import {add as addAlert} from '../actions/AlertActions.js';
+import SectionActions from '../actions/SectionActions.js';
 import sse from '../services/sse.js';
-import alerts from '../services/alerts.js';
 
-function errorHandler(message) {
-  return (xhr) => {
-    let error;
-    if (xhr.status === 500) {
-      error = 'Internal Server Error';
-    } else {
-      let response = JSON.parse(xhr.responseText);
-      error = response.message;
-    }
-    alerts.add('danger', `${message}: ${error}`);
-  };
-}
+export default createStore({
+  mixins: [FetchApiMixin, StateMixin],
+  isLoading: false,
+  sections: [],
 
-class SectionStore extends EventEmitter {
-  constructor() {
-    super();
-    this.isLoading = false;
-    this.sections = [];
-    this._updateSections = this._updateSections.bind(this);
-    sse.on('sections', this._updateSections);
-  }
+  init() {
+    sse.on('sections', this.updateSections);
+    this.listenToMany(SectionActions);
+  },
+
+  getState() {
+    return {
+      sections: this.sections
+    };
+  },
 
   load() {
-    this._startLoading();
-    $.getJSON('/api/sections')
-      .success(this._updateSections)
-      .fail(errorHandler('Failed to load sections'));
-  }
+    let {onSuccess, onError} = this.fetchHandlers({
+      errorMessage: 'Failed to load sections',
+      action: SectionActions.load,
+      dataHandler: this.updateSections
+    });
+    fetch('/api/sections')
+      .then(onSuccess, onError);
+  },
 
   toggle(id) {
-    this._startLoading();
-    $.post(`/api/sections/${id}/toggle`, {
-      dataType: 'json'
+    let {onSuccess, onError} = this.fetchHandlers({
+      errorMessage: 'Failed to toggle sections',
+      action: SectionActions.toggle,
+      dataHandler: this.updateSections
+    });
+    fetch(`/api/sections/${id}/toggle`, {
+      method: 'POST'
     })
-      .success(this._updateSections)
-      .fail(errorHandler('Failed to toggle section'));
-  }
+      .then(onSuccess, onError);
+  },
 
   run(id, time) {
-    this._startLoading();
-    $.ajax(`/api/sections/${id}/run`, {
+    let {onSuccess, onError} = this.fetchHandlers({
+      errorMessage: 'Failed to run section',
+      action: SectionActions.run,
+      dataHandler: this.updateSections
+    });
+    fetch(`/api/sections/${id}/run`, {
       method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         time
-      }),
-      dataType: 'json'
-    })
-      .success(data => {
-        alerts.add('success', data.message, true);
-        this._updateSections(data);
       })
-      .fail(errorHandler('Failed to run section'));
-  }
+    })
+      .then(onSuccess)
+      .then(data => addAlert('success', data.message, true), onError);
+  },
 
-  _startLoading() {
-    this.isLoading = true;
-    this.emitChange();
+  updateSections(sections) {
+    this.sections = sections;
+    this.stateUpdated();
   }
+});
 
-  _updateSections(response) {
-    this.sections = response.data;
-    this.isLoading = false;
-    this.emitChange();
-  }
-
-  emitChange() {
-    this.emit('change');
-  }
-
-  addChangeListener(listener) {
-    this.addListener('change', listener);
-  }
-
-  removeChangeListener(listener) {
-    this.removeListener('change', listener);
-  }
-}
-
-export default new SectionStore();
