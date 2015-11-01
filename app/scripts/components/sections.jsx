@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Button, ButtonGroup, Label, Glyphicon} from 'react-bootstrap';
-import {load, toggle} from '../actions/SectionActions.js';
+import {load, toggle} from '../actions/sections.js';
 
 export default class Sections extends React.Component {
   static propTypes = {
@@ -67,7 +67,7 @@ export default class Sections extends React.Component {
   render() {
     const {loading} = this.props;
     let refreshBtn = (
-      <Button disabled={loading} onClick={!loading ? load : null} ref='refresh'>
+      <Button disabled={loading} onClick={!loading ? load : null}>
         {loading ? 'Loading...' : (<Glyphicon glyph='refresh'/>)}
       </Button>
     );

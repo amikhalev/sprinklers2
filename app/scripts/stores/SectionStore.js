@@ -1,8 +1,9 @@
 import {createStore} from 'reflux';
 import {FetchApiMixin, StateMixin} from './StoreMixins.js';
-import {add as addAlert} from '../actions/AlertActions.js';
-import SectionActions from '../actions/SectionActions.js';
-import sse from '../services/sse.js';
+import {addAlertWithTimeout} from '../actions/alerts.js';
+import alertStore from './alerts.js';
+import SectionActions from '../actions/sections.js';
+import sse from '../util/sse.js';
 
 export default createStore({
   mixins: [FetchApiMixin, StateMixin],
@@ -59,7 +60,7 @@ export default createStore({
       })
     })
       .then(onSuccess)
-      .then(data => addAlert('success', data.message, true), onError);
+      .then(data => alertStore.dispatch(addAlertWithTimeout('success', data.message)), onError);
   },
 
   updateSections(sections) {

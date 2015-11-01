@@ -3,14 +3,14 @@ import Promise from 'bluebird';
 const log = require('./lib/log')();
 
 import config from './lib/config';
-log.debug({config}, 'config');
+log.debug({ config }, 'config');
 
 import {Section, Program} from './lib/models';
 
-Promise.all([Section.list(), Program.list()])
+Promise.all([ Section.list(), Program.list() ])
   .spread((sections, programs) => {
-    log.debug({sections}, 'sections');
-    log.debug({programs}, 'programs');
+    log.debug({ sections }, 'sections');
+    log.debug({ programs }, 'programs');
     log.info('Initializing sections');
     return Promise.each(sections, section => section.initialize())
       .then(() => {
@@ -27,7 +27,7 @@ Promise.all([Section.list(), Program.list()])
         });
 
         process.on('exit', (code) => {
-          log.info({code}, 'Exiting...');
+          log.info({ code }, 'Exiting...');
         });
       });
   });
@@ -61,7 +61,7 @@ var PORT = process.env.PORT || config.server.port;
 var server = app.listen(PORT, () => {
   const host = server.address().address;
   const port = server.address().port;
-  log.info({address: server.address()}, `Sprinklers server listening at http://${host}:${port}`);
+  log.info({ address: server.address() }, `Sprinklers server listening at http://${host}:${port}`);
 });
 
 export default app;

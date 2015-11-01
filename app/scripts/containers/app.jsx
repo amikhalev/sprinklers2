@@ -5,16 +5,12 @@ import React, {PropTypes} from 'react';
 import {Nav, NavItem} from 'react-bootstrap';
 import {Router, Route} from 'react-router';
 
-import {load as loadPrograms} from './actions/ProgramActions.js';
-import {load as loadSections} from './actions/SectionActions.js';
+import Alerts from '../components/Alerts.jsx';
+import ProgramsPage from './ProgramsPage.jsx';
+import SectionsPage from './SectionsPage.jsx';
+import alertStore from '../stores/alerts.js';
 
-import Alerts from './components/Alerts.jsx';
-
-import ProgramsPage from './pages/ProgramsPage.jsx';
-import SectionsPage from './pages/SectionsPage.jsx';
-
-loadPrograms();
-loadSections();
+import 'styles/app.less';
 
 class App extends React.Component {
   static propTypes = {
@@ -35,24 +31,26 @@ class App extends React.Component {
       <div>
         <div className='header clearfix'>
           <Nav bsStyle='pills' pullRight>
-            {this.renderNavItem('sections', 'Sections')}
-            {this.renderNavItem('programs', 'Programs')}
+            {this.renderNavItem('/sections', 'Sections')}
+            {this.renderNavItem('/programs', 'Programs')}
           </Nav>
 
           <h3 className='text-muted'><a href={history.createHref('/')}>Sprinklers Control Panel</a></h3>
         </div>
-        <Alerts/>
+        <Alerts store={alertStore}/>
         {children}
       </div>
     );
   }
 }
 
-React.render((
+let router = (
   <Router>
     <Route component={App} path='/'>
       <Route path='sections' component={SectionsPage}/>
       <Route path='programs' component={ProgramsPage}/>
     </Route>
   </Router>
-), document.getElementById('app'));
+);
+
+export default router;

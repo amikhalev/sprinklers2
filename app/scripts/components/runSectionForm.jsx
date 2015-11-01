@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Input, Button} from 'react-bootstrap';
-import {run as runSection} from '../actions/SectionActions.js';
+import {run as runSection} from '../actions/sections.js';
 
 export default class RunSectionForm extends React.Component {
   static propTypes = {
@@ -46,7 +46,7 @@ export default class RunSectionForm extends React.Component {
       <div>
         <h2>Run section</h2>
 
-        <form onSubmit={this.run} ref='form'>
+        <form onSubmit={this.run}>
           <Input type='select' label='Section' placeholder='Choose a section' value={section}
                  onChange={this.onChangeSection}>
             {sections}

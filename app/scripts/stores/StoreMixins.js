@@ -1,4 +1,4 @@
-import {add as addAlert} from '../actions/AlertActions.js';
+import {addAlert} from '../actions/alerts.js';
 
 class RequestError extends Error {
   constructor(error) {

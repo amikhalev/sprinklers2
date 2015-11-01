@@ -6,12 +6,9 @@ var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
 var rename = require('gulp-rename');
 
-var browserify = require('browserify');
-var watchify = require('watchify');
-var babelify = require('babelify');
-var uglify = require('gulp-uglify');
+var webpack = require('webpack');
+var WebpackDevServer = require('webpack-dev-server');
 var concat = require('gulp-concat');
-var eslint = require('gulp-eslint');
 var babel = require('gulp-babel');
 
 var less = require('gulp-less-sourcemap');
@@ -27,33 +24,17 @@ var notifier = require('node-notifier');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var mkdirp = require('mkdirp');
-var glob = require('glob');
 var spawn = require('child_process').spawn;
 
 require('dotenv').load();
 var env = process.env;
 
 var paths = {
-  scripts: [
-    'app/scripts/**/**.{js,jsx}'
-  ],
-  styles: [
-    'app/styles/app.less'
-  ],
   views: [
     'app/views/**/*.jade'
   ],
-  fonts: [
-    'app/bower_components/bootstrap/dist/fonts/*'
-  ],
   images: [
     'app/favicon.ico', 'app/images/**/*.*'
-  ],
-  lint: [
-    'app.js',
-    'gulpfile.js',
-    'lib/**/*.js',
-    'app/scripts/**/*.{js,jsx}'
   ],
   dist: [
     'package.json',
@@ -67,83 +48,25 @@ var paths = {
   ]
 };
 
-gulp.task('clean', function (cb) {
-  del(['public', 'dist'], cb);
-});
-
-function scripts(b) {
-  return b
-    .bundle()
-    .on('error', function (err) {
-      gutil.log('[browserify] error:');
-      gutil.log(err.toString());
-      notifier.notify({
-        title: '[browserify] error',
-        message: err.toString()
-      });
-    })
-    .pipe(source('all.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('public/scripts'));
+function webpackTask(config) {
+  return function (cb) {
+    webpack(config, function (err, stats) {
+      if (err) {
+        throw new gutil.PluginError('webpack', err);
+      }
+      gutil.log('[webpack]', stats.toString({
+        colors: true
+      }));
+      cb();
+    });
+  }
 }
 
-var scriptEntries = paths.scripts.map(function (pattern) {
-  return glob.sync(pattern);
-}).reduce(function (scs, sc) {
-  return scs.concat(sc);
-}, []);
-
-var bundler = browserify({
-  entries: scriptEntries,
-  debug: true,
-  fullPaths: true
-}).transform(babelify);
-
-
-gulp.task('scripts', scripts.bind(null, bundler));
-gulp.task('scripts:watch', function () {
-  var watcher = watchify(bundler);
-  watcher.on('update', function () {
-    gutil.log('[watchify] updating');
-    return scripts(watcher)
-      .on('end', function () {
-        notifier.notify({
-          title: '[watchify]',
-          message: 'updated scripts'
-        });
-      });
-  });
-  watcher.on('log', gutil.log);
-  return scripts(watcher);
+gulp.task('clean', function (cb) {
+  del([ 'public', 'dist' ], cb);
 });
 
-gulp.task('styles', function () {
-  return gulp.src(paths.styles)
-    .pipe(cache('styles'))
-    .pipe(sourcemaps.init())
-    .pipe(less({
-      sourceMap: {
-        sourceMapFileInline: true
-      }
-    }))
-    .on('error', function (error) {
-      gutil.log(gutil.colors.red(error.message));
-      notifier.notify({
-        title: 'Less compilation error',
-        message: error.message
-      });
-    })
-    .pipe(remember('styles'))
-    .pipe(concat('all.css'))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('public/styles'));
-});
-
-gulp.task('styles:watch', function () {
-  gulp.watch(paths.styles, ['styles']);
-});
+gulp.task('webpack', webpackTask(require('./webpack.dev.config')));
 
 gulp.task('views', function () {
   return gulp.src(paths.views)
@@ -156,12 +79,7 @@ gulp.task('views', function () {
 });
 
 gulp.task('views:watch', function () {
-  gulp.watch(paths.views, ['views']);
-});
-
-gulp.task('fonts', function () {
-  return gulp.src(paths.fonts)
-    .pipe(gulp.dest('public/fonts'));
+  gulp.watch(paths.views, [ 'views' ]);
 });
 
 gulp.task('images', function () {
@@ -169,33 +87,7 @@ gulp.task('images', function () {
     .pipe(gulp.dest('public'));
 });
 
-gulp.task('lint', function () {
-  return gulp.src(paths.lint)
-    .pipe(eslint())
-    .pipe(eslint.format('node_modules/eslint-friendly-formatter'));
-});
-
-gulp.task('lint:watch', function () {
-  gulp.watch(paths.lint, ['lint']);
-});
-
-var client = ['scripts', 'styles', 'views', 'fonts', 'lint'];
-
-gulp.task('dist:scripts', ['scripts'], function () {
-  return gulp.src('public/scripts/all.js')
-    .pipe(uglify())
-    .on('error', gutil.log)
-    .pipe(rename('all.min.js'))
-    .pipe(gulp.dest('dist/public/scripts'));
-});
-
-gulp.task('dist:styles', ['styles'], function () {
-  return gulp.src('public/styles/all.css')
-    .pipe(minifyCss())
-    .on('error', gutil.log)
-    .pipe(rename('all.min.css'))
-    .pipe(gulp.dest('dist/public/styles'));
-});
+var client = [ 'views' ];
 
 gulp.task('dist:views', function () {
   return gulp.src(paths.views)
@@ -208,21 +100,21 @@ gulp.task('dist:views', function () {
 });
 
 gulp.task('dist:babel', function () {
-  return gulp.src(['app.js', 'lib/**/*.js'], {base: '.'})
+  return gulp.src([ 'app.js', 'lib/**/*.js' ], { base: '.' })
     .pipe(sourcemaps.init())
     .pipe(babel())
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dist:copy', ['fonts'], function () {
-  return gulp.src(paths.dist, {base: '.'})
+gulp.task('dist:copy', function () {
+  return gulp.src(paths.dist, { base: '.' })
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dist:install', ['dist:copy'], function () {
+gulp.task('dist:install', [ 'dist:copy' ], function () {
   return gulp.src('dist/package.json')
-    .pipe(install({production: true}));
+    .pipe(install({ production: true }));
 });
 
 gulp.task('dist:logs', function (cb) {
@@ -234,9 +126,11 @@ gulp.task('dist:misc', function () {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dist', ['dist:copy', 'dist:scripts', 'dist:styles', 'dist:views', 'dist:babel', 'dist:install', 'dist:logs', 'dist:misc']);
+gulp.task('dist:webpack', webpackTask(require('./webpack.dist.config.js')));
 
-gulp.task('deploy', ['dist'], function () {
+gulp.task('dist', [ 'dist:copy', 'dist:webpack', 'dist:views', 'dist:babel', 'dist:install', 'dist:logs', 'dist:misc' ]);
+
+gulp.task('deploy', [ 'dist' ], function () {
   return gulp.src('dist')
     .pipe(rsync({
       root: 'dist',
@@ -258,13 +152,35 @@ gulp.task('deploy', ['dist'], function () {
     });
 });
 
-gulp.task('watch', ['scripts:watch', 'styles:watch', 'views:watch', 'lint:watch']);
+gulp.task('watch', [ 'views:watch' ]);
 
-gulp.task('run', function (cb) {
-  var proc = spawn('npm', ['start'], {
+gulp.task('server', function (cb) {
+  var proc = spawn('npm', [ 'start' ], {
     stdio: 'inherit'
   });
   proc.on('exit', cb);
 });
 
-gulp.task('default', ['run'].concat(client).concat(['watch']));
+gulp.task('webpack-dev-server', function () {
+  var config = require('./webpack.dev.config');
+  config.entry.unshift('webpack/hot/only-dev-server');
+  config.entry.unshift('webpack-dev-server/client?http://localhost:8081');
+  var compiler = webpack(config);
+  new WebpackDevServer(compiler, {
+    contentBase: './public/',
+    publicPath: '/assets/',
+    hot: true,
+    historyApiFallback: true,
+    proxy: {
+      '*': 'http://localhost:8080'
+    },
+    stats: { colors: true, progress: true }
+  }).listen(8081, 'localhost', function (err) {
+      if (err) {
+        throw new gutil.PluginError('webpack-dev-server', 'Webpack dev server error', err);
+      }
+      gutil.log('[webpack-dev-server]', 'Webpack dev server listening at localhost:8081');
+    });
+});
+
+gulp.task('default', [ 'server', 'webpack-dev-server' ].concat(client).concat([ 'watch' ]));
