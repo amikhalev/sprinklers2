@@ -12,5 +12,6 @@ config.module.loaders.push({ test: /\.jsx?$/, exclude: /(node_modules|bower_comp
 config.plugins.push(new webpack.optimize.UglifyJsPlugin({
   minimize: true
 }));
+config.plugins.push(new webpack.optimize.DedupePlugin());
 
 module.exports = config;
