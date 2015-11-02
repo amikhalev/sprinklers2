@@ -1,14 +1,16 @@
 import React, {PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import {List} from 'immutable';
 import {ListGroup, ListGroupItem} from 'react-bootstrap';
 import Program from './Program.jsx';
 
 export default class Programs extends React.Component {
   static propTypes = {
-    programs: PropTypes.array
+    programs: ImmutablePropTypes.list.isRequired
   };
 
   static defaultProps = {
-    programs: []
+    programs: List()
   };
 
   renderProgram = program => (

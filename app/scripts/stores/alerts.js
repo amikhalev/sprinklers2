@@ -1,11 +1,4 @@
-import {createStore, applyMiddleware} from 'redux';
-import thunk from 'redux-thunk';
-import alerts from '../reducers/alerts';
+import {alerts} from '../reducers';
+import createStore from '../createStore.js';
 
-const finalCreateStore = applyMiddleware(
-  thunk
-)(createStore);
-
-export default finalCreateStore(alerts);
-
-
+export default createStore(alerts);

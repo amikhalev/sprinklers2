@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Input, Button, ButtonGroup, Glyphicon} from 'react-bootstrap';
-import ProgramStore from '../stores/ProgramStore.js';
+import ProgramStore from '../stores/programs.js';
 
 export default class Program extends React.Component {
   static propTypes = {

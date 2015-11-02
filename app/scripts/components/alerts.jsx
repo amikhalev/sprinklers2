@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import CSSTransitionGroup from 'react-addons-css-transition-group';
 import {connect} from 'react-redux';
 import {Alert} from 'react-bootstrap';
@@ -7,7 +8,7 @@ import {removeAlert} from '../actions/alerts.js';
 
 import 'styles/alerts.less';
 
-function mapStateToProps(alerts) {
+function mapStateToProps({alerts}) {
   return {alerts};
 }
 
@@ -20,7 +21,7 @@ function mapDispatchToProps(dispatch) {
 @connect(mapStateToProps, mapDispatchToProps)
 class Alerts extends Component {
   static propTypes = {
-    alerts: PropTypes.object,
+    alerts: ImmutablePropTypes.orderedMap,
     onDismissAlert: PropTypes.func
   };
 

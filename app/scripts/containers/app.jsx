@@ -4,11 +4,13 @@ import 'whatwg-fetch';
 import React, {PropTypes} from 'react';
 import {Nav, NavItem} from 'react-bootstrap';
 import {Router, Route} from 'react-router';
+import createBrowserHistory from 'history/lib/createBrowserHistory'
 
 import Alerts from '../components/Alerts.jsx';
 import ProgramsPage from './ProgramsPage.jsx';
 import SectionsPage from './SectionsPage.jsx';
 import alertStore from '../stores/alerts.js';
+import programStore from '../stores/programs.js';
 
 import 'styles/app.less';
 
@@ -45,10 +47,10 @@ class App extends React.Component {
 }
 
 let router = (
-  <Router>
+  <Router history={createBrowserHistory()}>
     <Route component={App} path='/'>
       <Route path='sections' component={SectionsPage}/>
-      <Route path='programs' component={ProgramsPage}/>
+      <Route path='programs' component={() => <ProgramsPage store={programStore} />}/>
     </Route>
   </Router>
 );

@@ -1,19 +1,30 @@
-import React from 'react';
-import {connect as connectToStore} from 'reflux';
+import React, {PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import {connect} from 'react-redux';
+import {runProgram} from '../actions/programs.js'
 import Programs from '../components/Programs.jsx';
 import RunProgramForm from '../components/RunProgramForm.jsx';
-import ProgramStore from '../stores/ProgramStore.js';
 
-export default React.createClass({
-  mixins: [connectToStore(ProgramStore)],
+@connect(state => ({
+  programs: state.programs
+}), dispatch => ({
+  runProgram: (id) => dispatch(runProgram(id))
+}))
+class ProgramsPage extends React.Component {
+  static propTypes = {
+    programs: ImmutablePropTypes.list.isRequired,
+    runProgram: PropTypes.func.isRequired
+  };
 
   render() {
-    let {programs} = this.state;
+    let {programs, runProgram} = this.props;
     return (
       <div>
-        <RunProgramForm programs={programs}/>
+        <RunProgramForm programs={programs} runProgram={runProgram} />
         <Programs programs={programs}/>
       </div>
     );
   }
-});
+}
+
+export default ProgramsPage;

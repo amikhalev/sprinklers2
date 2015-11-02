@@ -1,5 +1,5 @@
 import {EventEmitter} from 'events';
-import {SSE_URL, SSE_EVENT_TYPES} from '../constants.js';
+import {SSE_URL, SSE_EVENT_TYPES} from '../constants/sprinklersApi.js';
 
 let sse = new EventEmitter();
 sse.eventSource = new EventSource(SSE_URL);

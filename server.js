@@ -37,14 +37,13 @@ import bodyParser from 'body-parser';
 import expressBunyan from 'express-bunyan-logger';
 //import auth from './lib/auth';
 import {HttpError, validationErrorHandler, syntaxErrorHandler} from './lib/errors';
-import {join} from 'path';
+import {resolve} from 'path';
 
 const app = express();
 
 app.use(expressBunyan(config.server.logger));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static(join(__dirname, 'public')));
 
 //app.use('/', auth());
 //app.use('/api', auth());
@@ -52,6 +51,11 @@ app.use(express.static(join(__dirname, 'public')));
 app.use('/api/sections', require('./lib/routes/sections'));
 app.use('/api/programs', require('./lib/routes/programs'));
 app.use('/api/sse', require('./lib/routes/sse').route);
+
+app.use(express.static(resolve(__dirname, 'public')));
+app.get('*', function (req, res){
+  res.sendFile(resolve(__dirname, 'public', 'index.html'))
+});
 
 app.use(validationErrorHandler);
 app.use(syntaxErrorHandler);

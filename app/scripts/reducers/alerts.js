@@ -1,17 +1,15 @@
-import {ADD_ALERT, REMOVE_ALERT} from '../constants.js';
+import {handleActions} from 'redux-actions';
 import {OrderedMap} from 'immutable';
+import * as actionTypes from '../constants/actionTypes.js';
 
-export default function (state = OrderedMap(), action = undefined) {
-  switch (action.type) {
-    case ADD_ALERT: {
-      let {id, style, message} = action;
-      let alert = { style, message };
-      return state.set(id, alert);
-    }
-    case REMOVE_ALERT: {
-      let {id} = action;
-      return state.delete(id);
-    }
+export default handleActions({
+  [actionTypes.ADD_ALERT]: ({alerts}, {payload}) => {
+    let {id, ...alert} = payload;
+    return { alerts: alerts.set(id, alert) };
+  },
+  [actionTypes.REMOVE_ALERT]: ({alerts}, {payload}) => {
+    return { alerts: alerts.delete(payload) };
   }
-  return state;
-}
+}, {
+  alerts: OrderedMap()
+});
