@@ -6,11 +6,7 @@ import {Input, Button} from 'react-bootstrap';
 export default class RunProgramForm extends React.Component {
   static propTypes = {
     programs: ImmutablePropTypes.list.isRequired,
-    runProgram: PropTypes.func.isRequired
-  };
-
-  static defaultProps = {
-    programs: List()
+    onRunProgramClick: PropTypes.func.isRequired
   };
 
   constructor() {
@@ -20,18 +16,16 @@ export default class RunProgramForm extends React.Component {
     };
   }
 
-  onChangeProgram(e) {
+  onChangeProgram = (e) => {
     this.setState({
       program: e.target.value
     });
-  }
+  };
 
-  run(e) {
-    let {program} = this.state;
-    let {runProgram} = this.props;
-    runProgram(program);
+  run = (e) => {
+    this.props.onRunProgramClick(this.state.program);
     e.preventDefault();
-  }
+  };
 
   render() {
     let {program} = this.state;
@@ -44,10 +38,10 @@ export default class RunProgramForm extends React.Component {
 
         <form>
           <Input type='select' label='Program' placeholder='Choose a program' value={program}
-                 onChange={this.onChangeProgram.bind(this)}>
+                 onChange={this.onChangeProgram}>
             {programs}
           </Input>
-          <Button onClick={this.run.bind(this)}>Run</Button>
+          <Button onClick={this.run}>Run</Button>
         </form>
       </div>
     );

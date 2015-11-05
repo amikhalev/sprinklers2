@@ -100,7 +100,7 @@ gulp.task('dist:views', function () {
 });
 
 gulp.task('dist:babel', function () {
-  return gulp.src([ 'app.js', 'lib/**/*.js' ], { base: '.' })
+  return gulp.src([ 'server.js', 'lib/**/*.js' ], { base: '.' })
     .pipe(sourcemaps.init())
     .pipe(babel())
     .pipe(sourcemaps.write())

@@ -1,14 +1,11 @@
 import React, {PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import {Input, Button} from 'react-bootstrap';
-import {run as runSection} from '../actions/sections.js';
 
 export default class RunSectionForm extends React.Component {
   static propTypes = {
-    sections: PropTypes.array
-  };
-
-  static defaultProps = {
-    sections: []
+    sections: ImmutablePropTypes.list.isRequired,
+    runSection: PropTypes.func.isRequired
   };
 
   constructor() {
@@ -33,8 +30,9 @@ export default class RunSectionForm extends React.Component {
 
   run = (e) => {
     let {section, time} = this.state;
-    runSection(section, time);
+    let {runSection} = this.props;
     e.preventDefault();
+    runSection(section, time);
   };
 
   render() {

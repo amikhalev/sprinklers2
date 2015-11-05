@@ -1,90 +1,134 @@
 import React, {PropTypes} from 'react';
-import {Input, Button, ButtonGroup, Glyphicon} from 'react-bootstrap';
-import ProgramStore from '../stores/programs.js';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import {Input, Button, Glyphicon} from 'react-bootstrap';
+import {clone} from 'lodash';
+import ProgramTimes from './ProgramTimes.jsx';
+
+import 'styles/program.less';
 
 export default class Program extends React.Component {
   static propTypes = {
-    program: PropTypes.object
+    program: PropTypes.shape({
+      name: PropTypes.string,
+      enabled: PropTypes.bool,
+      running: PropTypes.bool,
+      when: PropTypes.string,
+      times: ImmutablePropTypes.list
+    }).isRequired,
+    onDoneEditing: PropTypes.func.isRequired
   };
 
   constructor() {
     super();
     this.state = {
-      editing: false
-    };
+      editing: false,
+      editData: null
+    }
   }
 
-  edit = () => {
+  onEditClick() {
     this.setState({
-      editing: true
+      editing: true,
+      editData: clone(this.props.program)
     });
-  };
+  }
 
-  done = () => {
+  clearEditState() {
     this.setState({
-      editing: false
+      editing: false,
+      editData: null
     });
-  };
+  }
 
-  handleScheduleChange = (event) => {
-    ProgramStore.setWhen(this.props.program.name, event.target.value);
-  };
+  onDoneEditClick() {
+    this.props.onDoneEditing(this.state.editData);
+    this.clearEditState();
+  }
 
-  renderTime = (time, i) => {
-    const {editing} = this.state;
-    let actions;
+  onCancelEditClick() {
+    this.clearEditState();
+  }
+
+  onScheduleChange(e) {
+    const {editData} = this.state;
+    this.setState({
+      editData: {
+        ...editData,
+        when: e.target.value
+      }
+    })
+  }
+
+  onToggleEnabled() {
+    const {editing, editData} = this.state;
     if (editing) {
-      actions = (
-        <td>
-          <ButtonGroup>
-            <Button bsStyle='danger'><Glyphicon glyph='remove'/></Button>
-            <Button bsStyle='default'><Glyphicon glyph='arrow-up'/></Button>
-            <Button bsStyle='default'><Glyphicon glyph='arrow-down'/></Button>
-          </ButtonGroup>
-        </td>
-      );
+      this.setState({
+        editData: {
+          ...editData,
+          enabled: !editData.enabled
+        }
+      });
     }
-    return (
-      <tr key={i}>
-        <td>{i}</td>
-        <td className='form form-inline'>
-          <Input type='number' min='0' max='3600' value={time} addonAfter='s' readOnly={!editing}/>
-        </td>
-        {actions}
-      </tr>
-    );
-  };
+  }
+
+  onUpdateTimes(times) {
+    const {editData} = this.state;
+    this.setState({
+      editData: {
+        ...editData,
+        times
+      }
+    });
+  }
+
+  onAddTimeClick() {
+    const {editData} = this.state;
+    this.setState({
+      editData: {
+        ...editData,
+        times: editData.times.push({
+          section: 0,
+          time: 60
+        })
+      }
+    })
+  }
 
   render() {
-    let {name, enabled, running, when, times} = this.props.program;
-    let {editing} = this.state;
-    times = times.map(this.renderTime);
-    let editBtn;
+    const {editing} = this.state;
+    let dataSource;
     if (editing) {
-      editBtn = <Button className='right' bsStyle='success' onClick={this.done}>Done</Button>;
+      dataSource = this.state.editData;
     } else {
-      editBtn = <Button className='right' bsStyle='primary' onClick={this.edit}>Edit</Button>;
+      dataSource = this.props.program;
+    }
+    const {name, enabled, running, when, times} = dataSource;
+    let editButtons;
+    let addButton;
+    if (editing) {
+      editButtons = (
+        <span>
+          <Button bsStyle='success' onClick={() => this.onDoneEditClick()}>Done</Button>
+          <Button bsStyle='danger' onClick={() => this.onCancelEditClick()}>Cancel</Button>
+        </span>
+      );
+      addButton = (
+        <Button bsStyle='primary' onClick={() => this.onAddTimeClick()}><Glyphicon glyph='plus' /></Button>
+      );
+    } else {
+      editButtons = <Button bsStyle='primary' onClick={() => this.onEditClick()}>Edit</Button>;
     }
     return (
       <div>
-        <div className='form form-inline'>
-          <h3>{name}</h3>&nbsp;
-          <Input checked={enabled} readOnly={!editing} label='Enabled' type='checkbox'/>&nbsp;
-          <Input checked={running} readOnly={!editing} label='Running' type='checkbox'/>&nbsp;
-          {editBtn}
+        <div className='form form-inline program-header'>
+          <h3 className='program-name'>{name}</h3>
+          <Button active={enabled} onClick={() => this.onToggleEnabled()}>{enabled ? 'Enabled' : 'Disabled'}</Button>
+          <Button active={running}>{running ? 'Running' : 'Not Running'}</Button>
+          {editButtons}
         </div>
-        <Input type='text' label='Schedule' value={when} readOnly={!editing} onChange={this.handleScheduleChange}/>
-        <label>Times</label>
-        <table className='table table-bordered'>
-          <thead>
-          <tr>
-            <th>#</th>
-            <th>Time</th>
-            {editing ? <th>Actions</th> : null}
-          </tr>
-          </thead>
-          <tbody>{times}</tbody>
-        </table>
+        <Input type='text' label='Schedule' value={when} readOnly={!editing} onChange={e => this.onScheduleChange(e)}/>
+        <label>Times {addButton}</label>
+        <ProgramTimes times={times} editing={editing} onUpdateTimes={times => this.onUpdateTimes(times)}/>
       </div>
     );
   }

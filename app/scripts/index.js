@@ -1,15 +1,26 @@
 import 'babel/polyfill';
 import 'whatwg-fetch';
 
+import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {fetchPrograms} from './actions/programs.js';
-import programStore from './stores/programs.js';
-import {load as loadSections} from './actions/sections.js';
+import store from 'scripts/store.js';
+import Root from './containers/Routes.jsx';
+import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 
-import App from './containers/App.jsx';
+let debugPanel;
 
-programStore.dispatch(fetchPrograms());
-loadSections();
+if (__DEBUG__) {
+  debugPanel = (
+    <DebugPanel top right bottom>
+      <DevTools store={store} monitor={LogMonitor} />
+    </DebugPanel>
+  );
+}
 
-ReactDOM.render(App, document.getElementById('app'));
+ReactDOM.render((
+  <div>
+    <Root store={store}/>
+    {debugPanel}
+  </div>
+), document.getElementById('app'));

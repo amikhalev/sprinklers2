@@ -9,6 +9,9 @@ config.output = {
   filename: 'bundle.min.js'
 };
 config.module.loaders.push({ test: /\.jsx?$/, exclude: /(node_modules|bower_components)/, loader: 'babel' });
+config.plugins.push(new webpack.DefinePlugin({
+  __DEBUG__: false
+}));
 config.plugins.push(new webpack.optimize.UglifyJsPlugin({
   minimize: true
 }));

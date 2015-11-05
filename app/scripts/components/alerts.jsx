@@ -8,8 +8,8 @@ import {removeAlert} from '../actions/alerts.js';
 
 import 'styles/alerts.less';
 
-function mapStateToProps({alerts}) {
-  return {alerts};
+function mapStateToProps(state) {
+  return {alerts: state.alerts.alerts};
 }
 
 function mapDispatchToProps(dispatch) {

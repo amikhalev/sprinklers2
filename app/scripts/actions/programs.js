@@ -1,23 +1,25 @@
 import {createAction} from 'redux-actions';
 import * as actionTypes from '../constants/actionTypes.js';
-import {addAlertWithTimeout} from './alerts.js';
-import alertStore from '../stores/alerts.js';
 import * as sprinklersApi from '../util/sprinklersApi.js';
+import {addAlertWithTimeout, addAlert} from './alerts.js';
 
-export const onFetchPrograms = createAction(actionTypes.FETCH_PROGRAMS);
+export const requestPrograms = createAction(actionTypes.REQUEST_PROGRAMS);
 
-export const fetchedPrograms = createAction(actionTypes.FETCHED_PROGRAMS);
+export const receivePrograms = createAction(actionTypes.RECEIVE_PROGRAMS);
 
 export function fetchPrograms() {
   return dispatch => {
-    dispatch(onFetchPrograms());
-    let promise = sprinklersApi.fetchPrograms()
-      .then(res => res.data);
-    dispatch(fetchedPrograms(promise));
+    dispatch(requestPrograms());
+    dispatch(receivePrograms(sprinklersApi.fetchPrograms()));
   };
 }
 
-export const runProgram = createAction(actionTypes.RUN_PROGRAM, (id) =>
-    sprinklersApi.runProgram(id)
-      .then(data => alertStore.dispatch(addAlertWithTimeout('success', data.message)))
-);
+export const updateProgram = createAction(actionTypes.UPDATE_PROGRAM, (id, data) => ({ id, data }));
+
+export const onRunProgram = createAction(actionTypes.RUN_PROGRAM);
+
+export function runProgram(id) {
+  return dispatch => sprinklersApi.runProgram(id)
+    .then(data => dispatch(addAlertWithTimeout('success', data.message)))
+    .catch(error => dispatch(addAlert('danger', `Failed to run program: ${error.message}`)))
+}

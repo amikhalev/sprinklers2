@@ -1,15 +1,18 @@
 import React, {PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import {Button, ButtonGroup, Label, Glyphicon} from 'react-bootstrap';
-import {load, toggle} from '../actions/sections.js';
+import Section from './Section.jsx';
 
 export default class Sections extends React.Component {
   static propTypes = {
-    loading: PropTypes.bool,
-    sections: PropTypes.array.isRequired
+    isLoading: PropTypes.bool,
+    sections: ImmutablePropTypes.list.isRequired,
+    onRefreshClick: PropTypes.func.isRequired,
+    onSectionClick: PropTypes.func.isRequired
   };
 
   static defaultProps = {
-    loading: false,
+    isLoading: false,
     sections: []
   };
 
@@ -45,33 +48,27 @@ export default class Sections extends React.Component {
   }
 
   renderSection = (section, index) => {
-    const {loading} = this.props;
-    let timeLeft;
+    let secondsLeft = 0;
     if (section.endTime != null) {
-      var msLeft = new Date(section.endTime).getTime() - this.state.now.getTime();
-      var left = Math.ceil(msLeft / 1000);
-      if (left > 0) {
-        timeLeft = <Label bsStyle='primary'>{left} seconds left</Label>;
+      let msLeft = new Date(section.endTime).getTime() - this.state.now.getTime();
+      if (msLeft > 0) {
+        secondsLeft = Math.ceil(msLeft / 1000);
       }
     }
-    let pin = <Label>pin {section.pin}</Label>;
     return (
-      <Button key={section.name} className={section.value ? 'active' : ''}
-              disabled={loading} onClick={toggle.bind(this, index)}>
-        {section.name}&nbsp;
-        <div className='right'>{timeLeft}&nbsp;{pin}</div>
-      </Button>
+      <Section key={section.name} {...section} runTimeLeft={secondsLeft} isLoading={this.props.isLoading}
+               onClick={() => this.props.onSectionClick(index)}/>
     );
   };
 
   render() {
-    const {loading} = this.props;
+    const {isLoading, onRefreshClick} = this.props;
     let refreshBtn = (
-      <Button disabled={loading} onClick={!loading ? load : null}>
-        {loading ? 'Loading...' : (<Glyphicon glyph='refresh'/>)}
+      <Button disabled={isLoading} onClick={!isLoading ? this.props.onRefreshClick : null}>
+        {isLoading ? 'Loading...' : (<Glyphicon glyph='refresh'/>)}
       </Button>
     );
-    let sections = this.props.sections.map(this.renderSection);
+    let sections = this.props.sections.map(this.renderSection).toArray();
     return (
       <div>
         <h2>Section states&nbsp;{refreshBtn}</h2>

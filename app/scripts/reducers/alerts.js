@@ -7,9 +7,9 @@ export default handleActions({
     let {id, ...alert} = payload;
     return { alerts: alerts.set(id, alert) };
   },
-  [actionTypes.REMOVE_ALERT]: ({alerts}, {payload}) => {
-    return { alerts: alerts.delete(payload) };
-  }
+  [actionTypes.REMOVE_ALERT]: ({alerts}, {payload}) => ({
+    alerts: alerts.delete(payload)
+  })
 }, {
   alerts: OrderedMap()
 });

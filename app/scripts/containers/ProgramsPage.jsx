@@ -1,27 +1,28 @@
 import React, {PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {runProgram} from '../actions/programs.js'
+import {runProgram, updateProgram} from '../actions/programs.js'
 import Programs from '../components/Programs.jsx';
 import RunProgramForm from '../components/RunProgramForm.jsx';
 
-@connect(state => ({
-  programs: state.programs
-}), dispatch => ({
-  runProgram: (id) => dispatch(runProgram(id))
-}))
+@connect(state => state.programs, dispatch => bindActionCreators({
+  onRunProgramClick: runProgram,
+  updateProgram
+}, dispatch))
 class ProgramsPage extends React.Component {
   static propTypes = {
     programs: ImmutablePropTypes.list.isRequired,
-    runProgram: PropTypes.func.isRequired
+    onRunProgramClick: PropTypes.func.isRequired,
+    updateProgram: PropTypes.func.isRequired
   };
 
   render() {
-    let {programs, runProgram} = this.props;
+    let {programs, onRunProgramClick, updateProgram} = this.props;
     return (
       <div>
-        <RunProgramForm programs={programs} runProgram={runProgram} />
-        <Programs programs={programs}/>
+        <RunProgramForm programs={programs} onRunProgramClick={onRunProgramClick} />
+        <Programs programs={programs} updateProgram={updateProgram} />
       </div>
     );
   }
