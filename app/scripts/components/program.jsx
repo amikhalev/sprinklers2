@@ -122,7 +122,7 @@ export default class Program extends React.Component {
       <div>
         <div className='form form-inline program-header'>
           <h3 className='program-name'>{name}</h3>
-          <Button active={enabled} onClick={() => this.onToggleEnabled()}>{enabled ? 'Enabled' : 'Disabled'}</Button>
+          <Button active={enabled} onClick={() => this.onToggleEnabled()} disabled={!editing}>{enabled ? 'Enabled' : 'Disabled'}</Button>
           <Button active={running}>{running ? 'Running' : 'Not Running'}</Button>
           {editButtons}
         </div>

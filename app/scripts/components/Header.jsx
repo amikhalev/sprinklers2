@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import {Nav, NavItem} from 'react-bootstrap';
+import {Link} from 'react-router';
 
 export default class Header extends React.Component {
   static propTypes = {
@@ -9,9 +10,13 @@ export default class Header extends React.Component {
   };
 
   renderNavItem = (title, path) => {
-    const {history} = this.props;
+    let active = this.props.history.isActive(path);
     return (
-      <NavItem key={path} active={history.isActive(path)} href={history.createHref(path)}>{title}</NavItem>
+      <li key={path} className={active ? 'active' : ''}>
+        <Link to={path}>
+          {title}
+        </Link>
+      </li>
     );
   };
 
@@ -24,7 +29,7 @@ export default class Header extends React.Component {
           {navItems}
         </Nav>
 
-        <h3 className='text-muted'><a href={history.createHref('/')}>Sprinklers Control Panel</a></h3>
+        <h3 className='text-muted'><Link to={'/'}>Sprinklers Control Panel</Link></h3>
       </div>
     );
   }

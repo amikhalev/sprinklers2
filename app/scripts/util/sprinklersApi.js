@@ -1,4 +1,5 @@
-import {API_URL} from '../constants/sprinklersApi.js';
+import {API_URL, SSE_URL, SSE_EVENT_TYPES} from '../constants/sprinklersApi.js';
+import {EventEmitter} from 'events';
 
 const FETCH_INIT = {
   credentials: 'same-origin'
@@ -62,4 +63,19 @@ export function runSection(id, time) {
       time
     })
   }));
+}
+
+export class SSE extends EventEmitter {
+  constructor() {
+    super();
+  }
+
+  start() {
+    this.eventSource = new EventSource(SSE_URL);
+    SSE_EVENT_TYPES.forEach(type => {
+      this.eventSource.addEventListener(type, e => {
+        this.emit(type, JSON.parse(e.data));
+      });
+    });
+  }
 }
