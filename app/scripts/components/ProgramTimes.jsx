@@ -3,12 +3,19 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import {Input, Button, ButtonGroup, Glyphicon} from 'react-bootstrap';
 
 function humanReadableTime(seconds) {
-  let minutes = 0;
-  while (seconds >= 60) {
-    minutes++;
-    seconds -= 60;
+  let minutes = Math.floor(seconds / 60);
+  seconds = seconds % 60;
+  let hours = Math.floor(minutes / 60);
+  minutes = minutes % 60;
+
+  let string = `${seconds} s`;
+  if (minutes || hours) {
+    string = `${minutes} m ${string}`;
   }
-  return `${minutes} m ${seconds} s`;
+  if (hours) {
+    string = `${hours} h ${string}`;
+  }
+  return string;
 }
 
 export default class ProgramTimes extends React.Component {
