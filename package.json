@@ -49,6 +49,7 @@
     "gulp-util": "^3.0.6",
     "history": "^1.13.0",
     "jquery": "^2.1.4",
+    "less": "^2.5.3",
     "less-loader": "^2.2.1",
     "mkdirp": "^0.5.1",
     "node-notifier": "^4.2.3",

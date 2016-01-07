@@ -2,7 +2,6 @@ var gulp = require('gulp');
 
 var cache = require('gulp-cached');
 var remember = require('gulp-remember');
-var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
 var rename = require('gulp-rename');
 
@@ -10,9 +9,6 @@ var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var concat = require('gulp-concat');
 var babel = require('gulp-babel');
-
-var less = require('gulp-less-sourcemap');
-var minifyCss = require('gulp-minify-css');
 
 var jade = require('gulp-jade');
 
@@ -101,9 +97,7 @@ gulp.task('dist:views', function () {
 
 gulp.task('dist:babel', function () {
   return gulp.src([ 'server.js', 'lib/**/*.js' ], { base: '.' })
-    .pipe(sourcemaps.init())
     .pipe(babel())
-    .pipe(sourcemaps.write())
     .pipe(gulp.dest('dist'));
 });
 

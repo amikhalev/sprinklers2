@@ -58,9 +58,6 @@ export default class ProgramTimes extends React.Component {
   }
 
   renderSectionTime = (sectionTime, i) => {
-    if (typeof i !== 'number') {
-      alert(`i: ${i}`);
-    }
     const {editing} = this.props;
     const {section, time} = sectionTime;
     let sectionLabel, timeLabel, actions;
@@ -86,7 +83,7 @@ export default class ProgramTimes extends React.Component {
         </td>
       );
     } else {
-      sectionLabel = '' + section;
+      sectionLabel = String(section);
       timeLabel = humanReadableTime(time);
     }
     return (
