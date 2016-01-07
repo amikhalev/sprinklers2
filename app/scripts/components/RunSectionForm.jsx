@@ -49,7 +49,7 @@ export default class RunSectionForm extends React.Component {
                  onChange={this.onChangeSection}>
             {sections}
           </Input>
-          <Input type='number' label='Time (seconds)' min='0' max='3600' required value={time}
+          <Input type='number' label='Time (seconds)' min='0' max='21600' required value={time}
                  onChange={this.onChangeTime}/>
           <Button type='submit'>Run</Button>
         </form>

@@ -2,11 +2,13 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
-  cache: true,
-  stats: {
-    color: true,
-    reasons: true
+  progress: true,
+  stats: { colors: true, progress: true },
+  debug: true,
+  webpackMiddleware: {
+    noInfo: true
   },
+  cache: true,
   entry: [
     './app/scripts'
   ],

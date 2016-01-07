@@ -96,7 +96,7 @@ gulp.task('dist:views', function () {
 });
 
 gulp.task('dist:babel', function () {
-  return gulp.src([ 'server.js', 'lib/**/*.js' ], { base: '.' })
+  return gulp.src([ 'lib/**/*.js' ], { base: '.' })
     .pipe(babel())
     .pipe(gulp.dest('dist'));
 });
@@ -161,6 +161,7 @@ gulp.task('webpack-dev-server', function () {
   config.entry.unshift('webpack-dev-server/client?http://localhost:8081');
   var compiler = webpack(config);
   new WebpackDevServer(compiler, {
+    noInfo: true,
     contentBase: './public/',
     publicPath: '/assets/',
     hot: true,

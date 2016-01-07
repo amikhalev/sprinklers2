@@ -5,7 +5,6 @@
   "repository": "https://github.com/amikhalev/sprinklers2.git",
   "private": true,
   "dependencies": {
-    "basic-auth": "^1.0.3",
     "bluebird": "^3.0.0",
     "body-parser": "^1.13.1",
     "bunyan": "^1.4.0",
@@ -15,11 +14,10 @@
     "express-validation": "^0.4.3",
     "http-status": "^0.2.0",
     "immutable": "^3.7.4",
-    "jade": "^1.11.0",
-    "joi": "^6.6.1",
+    "joi": "^6.10.1",
     "later": "^1.1.6",
     "lodash": "^3.10.0",
-    "pi-gpio": "amikhalev/pi-gpio"
+    "pi-gpio": "^0.0.8"
   },
   "devDependencies": {
     "babel": "^5.0.0",
