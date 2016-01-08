@@ -8,7 +8,7 @@ import 'styles/app.less';
 
 export default class App extends React.Component {
   static propTypes = {
-    children: PropTypes.object.isRequired,
+    children: PropTypes.object,
     history: PropTypes.any.isRequired
   };
 
