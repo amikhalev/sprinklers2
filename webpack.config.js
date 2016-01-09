@@ -5,8 +5,10 @@ module.exports = {
   progress: true,
   stats: { colors: true, progress: true },
   debug: true,
-  webpackMiddleware: {
-    noInfo: true
+  webpackDevMiddleware: {
+    noInfo: true,
+    publicPath: '/assets/',
+    stats: { colors: true, progress: true }
   },
   cache: true,
   entry: [

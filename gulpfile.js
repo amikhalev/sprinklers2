@@ -6,7 +6,6 @@ var gutil = require('gulp-util');
 var rename = require('gulp-rename');
 
 var webpack = require('webpack');
-var WebpackDevServer = require('webpack-dev-server');
 var concat = require('gulp-concat');
 var babel = require('gulp-babel');
 
@@ -34,9 +33,6 @@ var paths = {
   ],
   dist: [
     'package.json',
-    'public/fonts/**/*',
-    'public/images/**/*',
-    'public/favicon.ico',
     'lib/**/*.json'
   ],
   misc: [
@@ -178,4 +174,4 @@ gulp.task('webpack-dev-server', function () {
     });
 });
 
-gulp.task('default', [ 'server', 'webpack-dev-server' ].concat(client).concat([ 'watch' ]));
+gulp.task('default', [ 'server' ].concat(client).concat([ 'watch' ]));

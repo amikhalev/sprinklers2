@@ -1,4 +1,4 @@
-import 'babel/polyfill';
+//import 'babel-polynpm ';
 import 'whatwg-fetch';
 
 import React from 'react';
