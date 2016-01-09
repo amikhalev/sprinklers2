@@ -1,6 +1,6 @@
 import {createAction} from 'redux-actions';
 import * as actionTypes from '../constants/actionTypes.js';
-import * as sprinklersApi from '../util/sprinklersApi.js';
+import sprinklersApi from '../util/sprinklersApi.js';
 import {addAlert, addAlertWithTimeout} from './alerts.js';
 
 export const requestSections = createAction(actionTypes.REQUEST_SECTIONS);

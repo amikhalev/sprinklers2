@@ -1,10 +1,6 @@
 import {API_URL, SSE_URL, SSE_EVENT_TYPES} from '../constants/sprinklersApi.js';
 import {EventEmitter} from 'events';
 
-const FETCH_INIT = {
-  credentials: 'same-origin'
-};
-
 class RequestError extends Error {
   constructor(error) {
     super();
@@ -15,57 +11,62 @@ class RequestError extends Error {
   }
 }
 
-function apiHandler(response) {
-  return response.json()
-    .then(json => {
-      if (!response.ok) {
-        throw new RequestError(json);
-      } else {
-        return json;
-      }
+class SprinklersApi {
+  static apiHandler(response) {
+    return response.json()
+      .then(json => {
+        if (!response.ok) {
+          throw new RequestError(json);
+        } else {
+          return json;
+        }
+      });
+  }
+
+  fetchApi(endpoint, data) {
+    const request = `${API_URL}/${endpoint}`;
+    return fetch(request, data)
+      .then(SprinklersApi.apiHandler);
+  }
+
+  fetchPrograms() {
+    return this.fetchApi('programs')
+      .then(res => res.data);
+  }
+
+  runProgram(id) {
+    return this.fetchApi(`programs/${id}/run`, {
+      method: 'POST'
     });
+  }
+
+  fetchSections() {
+    return this.fetchApi('sections')
+      .then(res => res.data);
+  }
+
+  toggleSection(id) {
+    return this.fetchApi(`sections/${id}/toggle`, {
+      method: 'POST'
+    });
+  }
+
+  runSection(id, time) {
+    return this.fetchApi(`sections/${id}/run`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        time
+      })
+    });
+  }
 }
 
-function fetchApi(request) {
-  return fetch(request, FETCH_INIT)
-    .then(apiHandler);
-}
+export default new SprinklersApi();
 
-export function fetchPrograms() {
-  return fetchApi(`${API_URL}/programs`)
-    .then(res => res.data);
-}
-
-export function runProgram(id) {
-  return fetchApi(new Request(`${API_URL}/programs/${id}/run`, {
-    method: 'POST'
-  }));
-}
-
-export function fetchSections() {
-  return fetchApi(`${API_URL}/sections`)
-    .then(res => res.data);
-}
-
-export function toggleSection(id) {
-  return fetchApi(new Request(`${API_URL}/sections/${id}/toggle`, {
-    method: 'POST'
-  }));
-}
-
-export function runSection(id, time) {
-  return fetchApi(new Request(`${API_URL}/sections/${id}/run`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      time
-    })
-  }));
-}
-
-export class SSE extends EventEmitter {
+export class SprinklersEvents extends EventEmitter {
   constructor() {
     super();
   }
