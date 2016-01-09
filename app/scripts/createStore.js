@@ -1,20 +1,28 @@
-import {compose, createStore, applyMiddleware} from 'redux';
+import {createStore, compose, applyMiddleware} from 'redux';
 import thunk from 'redux-thunk';
 import promise from 'redux-promise';
 import createLogger from 'redux-logger';
-import { devTools, persistState } from 'redux-devtools';
+import { persistState } from 'redux-devtools';
+import DevTools from './containers/DevTools.jsx';
 
-let middleware = [thunk, promise];
+const middleware = [ thunk, promise ];
 
 if (__DEBUG__) {
   middleware.push(createLogger());
 }
 
-let middlewareFunctions = [applyMiddleware.apply(null, middleware)];
+const middlewareFunctions = [ applyMiddleware.apply(null, middleware) ];
 
 if (__DEBUG__) {
-  middlewareFunctions.push(devTools());
-  middlewareFunctions.push(persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)));
+  function getDebugSessionKey() {
+    const matches = window.location.href.match(/[?&]debug_session=([^&]+)\b/);
+    return (matches && matches.length > 0) ? matches[ 1 ] : null;
+  }
+
+  middlewareFunctions.push(DevTools.instrument());
+  middlewareFunctions.push(persistState(getDebugSessionKey()));
 }
 
-export default compose.apply(null, middlewareFunctions)(createStore);
+const finalCreateStore = compose.apply(null, middlewareFunctions)(createStore);
+
+export default finalCreateStore;

@@ -3,7 +3,7 @@ var path = require('path');
 var webpack = require('webpack');
 var config = _.clone(require('./webpack.config'), true);
 
-config.devtool = 'eval';
+config.devtool = 'source-map';
 config.output = {
   path: path.join(__dirname, 'public', 'assets'),
   publicPath: 'assets/',
