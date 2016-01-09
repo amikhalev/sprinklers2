@@ -8,7 +8,6 @@ config.output = {
   publicPath: 'assets/',
   filename: 'bundle.min.js'
 };
-config.module.loaders.push({ test: /\.jsx?$/, exclude: /(node_modules|bower_components)/, loader: 'babel' });
 config.plugins.push(new webpack.DefinePlugin({
   __DEBUG__: false
 }));

@@ -151,27 +151,4 @@ gulp.task('server', function (cb) {
   proc.on('exit', cb);
 });
 
-gulp.task('webpack-dev-server', function () {
-  var config = require('./webpack.dev.config');
-  config.entry.unshift('webpack/hot/only-dev-server');
-  config.entry.unshift('webpack-dev-server/client?http://localhost:8081');
-  var compiler = webpack(config);
-  new WebpackDevServer(compiler, {
-    noInfo: true,
-    contentBase: './public/',
-    publicPath: '/assets/',
-    hot: true,
-    historyApiFallback: true,
-    proxy: {
-      '*': 'http://localhost:8080'
-    },
-    stats: { colors: true, progress: true }
-  }).listen(8081, 'localhost', function (err) {
-      if (err) {
-        throw new gutil.PluginError('webpack-dev-server', 'Webpack dev server error', err);
-      }
-      gutil.log('[webpack-dev-server]', 'Webpack dev server listening at localhost:8081');
-    });
-});
-
 gulp.task('default', [ 'server' ].concat(client).concat([ 'watch' ]));

@@ -10,11 +10,10 @@ config.output = {
   filename: 'bundle.js'
 };
 config.module.preLoaders.push({ test: /\.jsx?$/, exclude: /node_modules/, loader: 'eslint-loader' });
-config.module.loaders.push({ test: /\.jsx?$/, exclude: /(node_modules|bower_components)/, loaders: ['react-hot', 'babel'] });
-config.plugins.push(new webpack.HotModuleReplacementPlugin());
 config.plugins.push(new webpack.DefinePlugin({
   __DEBUG__: true
 }));
+config.plugins.push(new webpack.HotModuleReplacementPlugin());
 config.eslint = {
   formatter: require('eslint-friendly-formatter')
 };
