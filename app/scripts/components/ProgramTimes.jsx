@@ -18,6 +18,13 @@ function humanReadableTime(seconds) {
   return string;
 }
 
+function reinsert(list, from, to) {
+  let value = list.get(from);
+  return list
+    .remove(from)
+    .splice(to, 0, value);
+}
+
 export default class ProgramTimes extends React.Component {
   static propTypes = {
     times: ImmutablePropTypes.listOf(PropTypes.shape({
@@ -28,7 +35,15 @@ export default class ProgramTimes extends React.Component {
     onUpdateTimes: PropTypes.func.isRequired
   };
 
-  onChangeTime(i, e) {
+  constructor() {
+    super();
+    this.state = {
+      isDragging: false,
+      draggingIdx: 0
+    }
+  }
+
+  handleChangeTime(i, e) {
     const {times, onUpdateTimes} = this.props;
     onUpdateTimes(times.update(i, ({section}) => ({
       section,
@@ -36,24 +51,35 @@ export default class ProgramTimes extends React.Component {
     })));
   }
 
-  onDeleteClick(i) {
+  handleDeleteClick(i) {
     const {times, onUpdateTimes} = this.props;
     onUpdateTimes(times.delete(i));
   }
 
-  onMoveUpClick(i) {
-    if (i !== 0) {
-      const {times, onUpdateTimes} = this.props;
-      let time = times.get(i);
-      onUpdateTimes(times.delete(i).splice(i - 1, 0, time));
+  startDragging(i) {
+    if (this.props.editing) {
+      this.setState({
+        isDragging: true,
+        draggingIdx: i
+      });
     }
   }
 
-  onMoveDownClick(i) {
+  stopDragging() {
+    this.setState({
+      isDragging: false
+    });
+  }
+
+  performDragTo(i) {
     const {times, onUpdateTimes} = this.props;
-    if (i < times.size - 1) {
-      let time = times.get(i);
-      onUpdateTimes(times.delete(i).splice(i + 1, 0, time));
+    const {isDragging, draggingIdx} = this.state;
+    if (isDragging) {
+      console.log(`onMouseEnter(${i})`);
+      onUpdateTimes(reinsert(times, draggingIdx, i));
+      this.setState({
+        draggingIdx: i
+      });
     }
   }
 
@@ -66,19 +92,12 @@ export default class ProgramTimes extends React.Component {
         <Input type='number' value={section} onChange={e => this.onChangeSection(i, e)}/>
       );
       timeLabel = (
-        <Input type='number' min='0' max='3600' value={time} addonAfter='s' onChange={e => this.onChangeTime(i, e)}/>
+        <Input type='number' min='0' max='3600' value={time} addonAfter='s' onChange={e => this.handleChangeTime(i, e)}/>
       );
       actions = (
         <td className='program-time-actions'>
-          <Button bsStyle='danger' onClick={() => this.onDeleteClick(i)}>
+          <Button bsStyle='danger' onClick={() => this.handleDeleteClick(i)}>
             <Glyphicon glyph='remove'/>
-          </Button>
-          <Button bsStyle='default' onClick={() => this.onMoveUpClick(i)} disabled={i === 0}>
-            <Glyphicon glyph='arrow-up'/>
-          </Button>
-          <Button bsStyle='default' onClick={() => this.onMoveDownClick(i)}
-                  disabled={i === this.props.times.size - 1}>
-            <Glyphicon glyph='arrow-down'/>
           </Button>
         </td>
       );
@@ -86,8 +105,14 @@ export default class ProgramTimes extends React.Component {
       sectionLabel = String(section);
       timeLabel = humanReadableTime(time);
     }
+    const {isDragging, draggingIdx} = this.state;
+    const dragging = isDragging && draggingIdx == i;
+    const startDragging = () => this.startDragging(i);
+    const performDragTo = () => this.performDragTo(i);
+    const styles = `form form-inline program-time ${dragging ? 'dragging' : ''}`;
     return (
-      <tr key={i} className='form form-inline'>
+      <tr key={i} className={styles} onMouseDown={startDragging} onTouchStart={startDragging}
+          onMouseOver={performDragTo}>
         <td>{sectionLabel}</td>
         <td>{timeLabel}</td>
         {actions}
@@ -97,9 +122,14 @@ export default class ProgramTimes extends React.Component {
 
   render() {
     const {editing, times} = this.props;
-    const timeRows = times.map(this.renderSectionTime).toArray();
+    const {isDragging} = this.state;
+    const timeRows = times
+      .map(this.renderSectionTime)
+      .toArray();
+    const stopDragging = () => this.stopDragging();
     return (
-      <table className='table table-bordered'>
+      <table className={`table table-bordered program-times ${isDragging ? 'dragging' : ''}`}
+             onMouseUp={stopDragging} onTouchEnd={stopDragging}>
         <thead>
         <tr>
           <th className='program-time-header-section'>#</th>
@@ -107,7 +137,9 @@ export default class ProgramTimes extends React.Component {
           {editing ? <th>Actions</th> : null}
         </tr>
         </thead>
-        <tbody>{timeRows}</tbody>
+        <tbody>
+        {timeRows}
+        </tbody>
       </table>
     );
   }
