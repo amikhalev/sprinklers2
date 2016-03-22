@@ -31,12 +31,12 @@
       "name": "Main",
       "when": "at 8:00 am also at 10:00 pm",
       "times": [
-        120,
-        120,
-        120,
-        120,
-        120,
-        120
+        {"section": 0, "time": 120},
+        {"section": 1, "time": 120},
+        {"section": 2, "time": 120},
+        {"section": 3, "time": 120},
+        {"section": 4, "time": 120},
+        {"section": 5, "time": 120}
       ]
     },
     {
@@ -44,12 +44,12 @@
       "name": "Test",
       "when": "at 7:12 pm",
       "times": [
-        10,
-        10,
-        10,
-        10,
-        10,
-        10
+        {"section": 0, "time": 10},
+        {"section": 1, "time": 10},
+        {"section": 2, "time": 10},
+        {"section": 3, "time": 10},
+        {"section": 4, "time": 10},
+        {"section": 5, "time": 10}
       ]
     }
   ],

@@ -2,6 +2,13 @@ import {handleActions} from 'redux-actions';
 import {List, OrderedMap} from 'immutable';
 import * as actionTypes from '../constants/actionTypes.js';
 
+function fixProgram(program) {
+  return {
+    ...program,
+    times: List(program.times)
+  };
+}
+
 export default handleActions({
   [actionTypes.REQUEST_PROGRAMS]: (state) => ({
     ...state,
@@ -9,14 +16,11 @@ export default handleActions({
   }),
   [actionTypes.RECEIVE_PROGRAMS]: (state, {payload}) => ({
     isLoading: false,
-    programs: List(payload).map(program => ({
-      ...program,
-      times: List(program.times.map((time, section) => ({ time, section }))) // this should be changed on the server eventually...
-    }))
+    programs: List(payload).map(fixProgram)
   }),
-  [actionTypes.UPDATE_PROGRAM]: (state, {payload}) => ({
+  [actionTypes.RECEIVE_PROGRAM]: (state, {payload}) => ({
     ...state,
-    programs: state.programs.set(payload.id, payload.data)
+    programs: state.programs.set(payload.id, fixProgram(payload.data))
   })
 }, {
   isLoading: false,

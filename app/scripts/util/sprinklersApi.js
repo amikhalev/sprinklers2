@@ -40,6 +40,16 @@ class SprinklersApi {
     });
   }
 
+  updateProgram(id, newData) {
+    return this.fetchApi(`programs/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newData)
+    });
+  }
+
   fetchSections() {
     return this.fetchApi('sections')
       .then(res => res.data);
