@@ -9,7 +9,9 @@ config.output = {
   filename: 'bundle.min.js'
 };
 config.plugins.push(new webpack.DefinePlugin({
-  __DEBUG__: false
+  'process.env': {
+    NODE_ENV: '"production"'
+  }
 }));
 config.plugins.push(new webpack.optimize.UglifyJsPlugin({
   minimize: true

@@ -28,7 +28,7 @@ function reinsert(list, from, to) {
 export default class ProgramTimes extends React.Component {
   static propTypes = {
     times: ImmutablePropTypes.listOf(PropTypes.shape({
-      section: PropTypes.number,
+      sectionId: PropTypes.number,
       time: PropTypes.number
     })).isRequired,
     editing: PropTypes.bool,
@@ -43,10 +43,18 @@ export default class ProgramTimes extends React.Component {
     }
   }
 
+  handleChangeSection(i, e) {
+    const {times, onUpdateTimes} = this.props;
+    onUpdateTimes(times.update(i, ({time}) => ({
+      sectionId: Number(e.target.value),
+      time
+    })));
+  }
+
   handleChangeTime(i, e) {
     const {times, onUpdateTimes} = this.props;
-    onUpdateTimes(times.update(i, ({section}) => ({
-      section,
+    onUpdateTimes(times.update(i, ({sectionId}) => ({
+      sectionId,
       time: Number(e.target.value)
     })));
   }
@@ -85,14 +93,15 @@ export default class ProgramTimes extends React.Component {
 
   renderSectionTime = (sectionTime, i) => {
     const {editing} = this.props;
-    const {section, time} = sectionTime;
+    const {sectionId, time} = sectionTime;
     let sectionLabel, timeLabel, actions;
     if (editing) {
       sectionLabel = (
-        <Input type='number' value={section} onChange={e => this.onChangeSection(i, e)}/>
+        <Input type='number' value={sectionId} onChange={e => this.handleChangeSection(i, e)}/>
       );
       timeLabel = (
-        <Input type='number' min='0' max='3600' value={time} addonAfter='s' onChange={e => this.handleChangeTime(i, e)}/>
+        <Input type='number' min='0' max='3600' value={time} addonAfter='s'
+               onChange={e => this.handleChangeTime(i, e)}/>
       );
       actions = (
         <td className='program-time-actions'>
@@ -102,7 +111,7 @@ export default class ProgramTimes extends React.Component {
         </td>
       );
     } else {
-      sectionLabel = String(section);
+      sectionLabel = String(sectionId);
       timeLabel = humanReadableTime(time);
     }
     const {isDragging, draggingIdx} = this.state;
@@ -111,8 +120,8 @@ export default class ProgramTimes extends React.Component {
     const performDragTo = () => this.performDragTo(i);
     const styles = `form form-inline program-time ${dragging ? 'dragging' : ''}`;
     return (
-      <tr key={i} className={styles} onMouseDown={startDragging} onTouchStart={startDragging}
-          onMouseOver={performDragTo}>
+      <tr key={i} className={styles} /*onMouseDown={startDragging} onTouchStart={startDragging}
+          onMouseOver={performDragTo}*/>
         <td>{sectionLabel}</td>
         <td>{timeLabel}</td>
         {actions}

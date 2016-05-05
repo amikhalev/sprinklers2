@@ -1,0 +1,68 @@
+{
+  "Section": [
+    {
+      "id": 1,
+      "name": "Front Yard 1",
+      "pin": 16
+    },
+    {
+      "id": 2,
+      "name": "Front Yard 2",
+      "pin": 11
+    },
+    {
+      "id": 3,
+      "name": "Front Yard 3",
+      "pin": 40
+    },
+    {
+      "id": 4,
+      "name": "Back Yard 1",
+      "pin": 15
+    },
+    {
+      "id": 5,
+      "name": "Back Yard 2",
+      "pin": 22
+    },
+    {
+      "id": 6,
+      "name": "Garden",
+      "pin": 18
+    }
+  ],
+  "Program": [
+    {
+      "enabled": true,
+      "name": "Main",
+      "scheduleString": "at 8:00 am also at 10:00 pm",
+      "times": [
+        {"sectionId": 1, "time": 120},
+        {"sectionId": 2, "time": 120},
+        {"sectionId": 3, "time": 120},
+        {"sectionId": 4, "time": 120},
+        {"sectionId": 5, "time": 120},
+        {"sectionId": 6, "time": 120}
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Test",
+      "scheduleString": "at 7:12 pm",
+      "times": [
+        {"sectionId": 1, "time": 10},
+        {"sectionId": 2, "time": 10},
+        {"sectionId": 3, "time": 10},
+        {"sectionId": 4, "time": 10},
+        {"sectionId": 5, "time": 10},
+        {"sectionId": 6, "time": 10}
+      ]
+    }
+  ],
+  "users": [
+    {
+      "name": "amikhalev",
+      "password": "kakashka"
+    }
+  ]
+}

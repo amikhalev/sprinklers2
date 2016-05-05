@@ -6,13 +6,6 @@ import navigation from '../constants/navigation.js';
 
 import 'styles/app.less';
 
-let devTools;
-
-if (__DEBUG__) {
-  const DevTools = require('./DevTools.jsx').default;
-  devTools = <DevTools />;
-}
-
 export default class App extends React.Component {
   static propTypes = {
     children: PropTypes.object,
@@ -25,7 +18,6 @@ export default class App extends React.Component {
         <Header history={this.props.history} navigation={navigation} />
         <Alerts />
         {this.props.children}
-        {devTools}
       </div>
     );
   }

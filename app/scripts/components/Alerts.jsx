@@ -9,7 +9,7 @@ import {removeAlert} from '../actions/alerts.js';
 import 'styles/alerts.less';
 
 function mapStateToProps(state) {
-  return {alerts: state.alerts.alerts};
+  return { alerts: state.alerts.alerts };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -25,11 +25,25 @@ class Alerts extends Component {
     onDismissAlert: PropTypes.func
   };
 
-  renderAlert = (alert, id) => (
-    <Alert key={id} bsStyle={alert.style} onDismiss={this.props.onDismissAlert.bind(null, id)}>
-      {alert.message}
-    </Alert>
-  );
+  static renderMessage(message) {
+    return {
+      __html: message
+    }
+  }
+
+  renderAlert = (alert, id) => {
+    let contents;
+    if (alert.message.__html) {
+      contents = <span style={{display: 'inline'}} dangerouslySetInnerHTML={alert.message}/>
+    } else {
+      contents = alert.message;
+    }
+    return (
+      <Alert key={id} bsStyle={alert.style} onDismiss={this.props.onDismissAlert.bind(null, id)}>
+        {contents}
+      </Alert>
+    );
+  };
 
   render() {
     return (
@@ -41,6 +55,5 @@ class Alerts extends Component {
     );
   }
 }
-
 
 export default Alerts;

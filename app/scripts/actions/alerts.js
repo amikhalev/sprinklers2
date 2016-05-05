@@ -8,6 +8,13 @@ export const addAlert = createAction(actionTypes.ADD_ALERT, (style, message) => 
   style, message
 }));
 
+export function addPreformattedAlert(style, preformatted) {
+  let html = preformatted.replace(/(?:\r\n|\r|\n)/g, '<br />');
+  return addAlert(style, {
+    __html: html
+  });
+}
+
 export const removeAlert = createAction(actionTypes.REMOVE_ALERT);
 
 export function addAlertWithTimeout(style, message, timeout = 2.0) {

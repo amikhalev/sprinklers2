@@ -9,10 +9,10 @@ import 'styles/program.less';
 export default class Program extends React.Component {
   static propTypes = {
     program: PropTypes.shape({
+      id: PropTypes.number,
       name: PropTypes.string,
       enabled: PropTypes.bool,
-      running: PropTypes.bool,
-      when: PropTypes.string,
+      scheduleString: PropTypes.string,
       times: ImmutablePropTypes.list
     }).isRequired,
     onDoneEditing: PropTypes.func.isRequired
@@ -54,7 +54,7 @@ export default class Program extends React.Component {
     this.setState({
       editData: {
         ...editData,
-        when: e.target.value
+        scheduleString: e.target.value
       }
     })
   }
@@ -102,7 +102,7 @@ export default class Program extends React.Component {
     } else {
       dataSource = this.props.program;
     }
-    const {name, enabled, running, when, times} = dataSource;
+    const {name, enabled, scheduleString, times} = dataSource;
     let editButtons;
     let addButton;
     if (editing) {
@@ -113,7 +113,7 @@ export default class Program extends React.Component {
         </span>
       );
       addButton = (
-        <Button bsStyle='primary' onClick={() => this.onAddTimeClick()}><Glyphicon glyph='plus' /></Button>
+        <Button bsStyle='primary' onClick={() => this.onAddTimeClick()}><Glyphicon glyph='plus'/></Button>
       );
     } else {
       editButtons = <Button bsStyle='primary' onClick={() => this.onEditClick()}>Edit</Button>;
@@ -122,11 +122,12 @@ export default class Program extends React.Component {
       <div>
         <div className='form form-inline program-header'>
           <h3 className='program-name'>{name}</h3>
-          <Button active={enabled} onClick={() => this.onToggleEnabled()} disabled={!editing}>{enabled ? 'Enabled' : 'Disabled'}</Button>
-          <Button active={running}>{running ? 'Running' : 'Not Running'}</Button>
+          <Button active={enabled} onClick={() => this.onToggleEnabled()}
+                  disabled={!editing}>{enabled ? 'Enabled' : 'Disabled'}</Button>
           {editButtons}
         </div>
-        <Input type='text' label='Schedule' value={when} readOnly={!editing} onChange={e => this.onScheduleChange(e)}/>
+        <Input type='text' label='Schedule' value={scheduleString} readOnly={!editing}
+               onChange={e => this.onScheduleChange(e)}/>
         <label>Times {addButton}</label>
         <ProgramTimes times={times} editing={editing} onUpdateTimes={times => this.onUpdateTimes(times)}/>
       </div>

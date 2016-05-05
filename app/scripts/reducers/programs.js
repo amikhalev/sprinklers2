@@ -1,6 +1,7 @@
 import {handleActions} from 'redux-actions';
 import {List, OrderedMap} from 'immutable';
 import * as actionTypes from '../constants/actionTypes.js';
+import mergeById from '../util/mergeById';
 
 function fixProgram(program) {
   return {
@@ -16,7 +17,7 @@ export default handleActions({
   }),
   [actionTypes.RECEIVE_PROGRAMS]: (state, {payload}) => ({
     isLoading: false,
-    programs: List(payload).map(fixProgram)
+    programs: mergeById(state.programs, List(payload).map(fixProgram))
   }),
   [actionTypes.RECEIVE_PROGRAM]: (state, {payload}) => ({
     ...state,

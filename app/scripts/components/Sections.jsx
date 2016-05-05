@@ -3,6 +3,8 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import {Button, ButtonGroup, Label, Glyphicon} from 'react-bootstrap';
 import Section from './Section.jsx';
 
+import 'styles/section.less';
+
 export default class Sections extends React.Component {
   static propTypes = {
     isLoading: PropTypes.bool,
@@ -57,7 +59,7 @@ export default class Sections extends React.Component {
     }
     return (
       <Section key={section.name} {...section} runTimeLeft={secondsLeft} isLoading={this.props.isLoading}
-               onClick={() => this.props.onSectionClick(index)}/>
+               onClick={() => this.props.onSectionClick(section.id)}/>
     );
   };
 
@@ -70,7 +72,7 @@ export default class Sections extends React.Component {
     );
     let sections = this.props.sections.map(this.renderSection).toArray();
     return (
-      <div>
+      <div className='sections'>
         <h2>Section states&nbsp;{refreshBtn}</h2>
         <ButtonGroup vertical block>
           {sections}

@@ -1,7 +1,6 @@
-import {API_URL, SSE_URL, SSE_EVENT_TYPES} from '../constants/sprinklersApi.js';
 import {EventEmitter} from 'events';
 
-class RequestError extends Error {
+export class RequestError extends Error {
   constructor(error) {
     super();
     this.name = error.statusText;
@@ -11,22 +10,33 @@ class RequestError extends Error {
   }
 }
 
-class SprinklersApi {
+export class SprinklersAPI {
+  constructor(apiURL) {
+    this.apiURL = apiURL;
+  }
+
   static apiHandler(response) {
-    return response.json()
-      .then(json => {
+    return response.text()
+      .then(text => {
+        let json;
+        try {
+          json = JSON.parse(text)
+        } catch (err) {
+          throw new Error('Internal Server Error: ' + text);
+        }
         if (!response.ok) {
           throw new RequestError(json);
         } else {
           return json;
         }
-      });
+      })
   }
 
   fetchApi(endpoint, data) {
-    const request = `${API_URL}/${endpoint}`;
+    const request = `${this.apiURL}/${endpoint}`;
     return fetch(request, data)
-      .then(SprinklersApi.apiHandler);
+      .then(SprinklersAPI.apiHandler)
+      .catch(err => {throw err;});
   }
 
   fetchPrograms() {
@@ -74,15 +84,16 @@ class SprinklersApi {
   }
 }
 
-export default new SprinklersApi();
+export const SSE_EVENT_TYPES = [ 'sections', 'programs' ];
 
 export class SprinklersEvents extends EventEmitter {
-  constructor() {
+  constructor(url) {
     super();
+    this.url = url;
   }
 
   start() {
-    this.eventSource = new EventSource(SSE_URL);
+    this.eventSource = new EventSource(this.url);
     SSE_EVENT_TYPES.forEach(type => {
       this.eventSource.addEventListener(type, e => {
         this.emit(type, JSON.parse(e.data));

@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Button, Label} from 'react-bootstrap';
+import classNames from 'classnames';
 
 export default class Section extends React.Component {
   static propTypes = {
@@ -18,9 +19,13 @@ export default class Section extends React.Component {
       timeLeftLabel = <Label bsStyle='primary'>{runTimeLeft} seconds left</Label>;
     }
     let pinLabel = <Label>pin {pin}</Label>;
-    let labels = <div>{timeLeftLabel}&nbsp;{pinLabel}</div>;
+    let labels = <div className='section-labels'>{timeLeftLabel}&nbsp;{pinLabel}</div>;
+    let className = classNames({
+      'section': true,
+      'active': value
+    });
     return (
-      <Button className={value ? 'active' : ''} disabled={isLoading} onClick={() => this.props.onClick()}>
+      <Button className={className} disabled={isLoading} onClick={() => this.props.onClick()}>
         {name}&nbsp;{labels}
       </Button>
     );

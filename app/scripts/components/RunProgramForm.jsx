@@ -12,7 +12,7 @@ export default class RunProgramForm extends React.Component {
   constructor() {
     super();
     this.state = {
-      program: 0
+      program: 1
     };
   }
 
@@ -29,8 +29,8 @@ export default class RunProgramForm extends React.Component {
 
   render() {
     let {program} = this.state;
-    let programs = this.props.programs.map((program, i) => (
-      <option key={program.name} value={i}>{program.name}</option>
+    let programs = this.props.programs.map((program) => (
+      <option key={program.id} value={program.id}>{program.name}</option>
     ));
     return (
       <div>

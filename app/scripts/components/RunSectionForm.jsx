@@ -11,7 +11,7 @@ export default class RunSectionForm extends React.Component {
   constructor() {
     super();
     this.state = {
-      section: 0,
+      section: 1,
       time: ''
     };
   }
@@ -36,8 +36,8 @@ export default class RunSectionForm extends React.Component {
   };
 
   render() {
-    let sections = this.props.sections.map((section, i) => (
-      <option key={section.name} value={i}>{section.name}</option>
+    let sections = this.props.sections.map((section) => (
+      <option key={section.id} value={section.id}>{section.name}</option>
     ));
     let {section, time} = this.state;
     return (

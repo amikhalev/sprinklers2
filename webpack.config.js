@@ -12,7 +12,7 @@ module.exports = {
   },
   cache: true,
   entry: [
-    './app/scripts'
+    path.join(__dirname, 'app/scripts')
   ],
   module: {
     preLoaders: [],
@@ -29,7 +29,8 @@ module.exports = {
     alias: {
       'scripts': path.join(__dirname, 'app', 'scripts'),
       'styles': path.join(__dirname, 'app', 'styles')
-    }
+    },
+    extensions: ['', '.js', '.jsx']
   },
   plugins: []
 };

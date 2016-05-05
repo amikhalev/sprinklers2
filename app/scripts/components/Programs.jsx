@@ -6,6 +6,7 @@ import Program from './Program.jsx';
 
 export default class Programs extends React.Component {
   static propTypes = {
+    isLoading: PropTypes.bool,
     programs: ImmutablePropTypes.list.isRequired,
     updateProgram: PropTypes.func.isRequired
   };
@@ -14,9 +15,9 @@ export default class Programs extends React.Component {
     programs: List()
   };
 
-  renderProgram = (program, i) => (
-    <ListGroupItem key={program.name}>
-      <Program program={program} onDoneEditing={data => this.props.updateProgram(i, data)} />
+  renderProgram = (program) => (
+    <ListGroupItem key={program.id}>
+      <Program program={program} onDoneEditing={data => this.props.updateProgram(program.id, data)}/>
     </ListGroupItem>
   );
 

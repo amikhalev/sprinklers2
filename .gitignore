@@ -6,3 +6,5 @@
 /.env
 *.log
 npm-debug*
+*.db
+lib2
