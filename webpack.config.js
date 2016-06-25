@@ -17,7 +17,8 @@ module.exports = {
   module: {
     preLoaders: [],
     loaders: [
-      { test: /\.jsx?$/, exclude: /(node_modules|bower_components)/, loaders: [ 'babel' ] },
+      { test: /\.js(x?)$/, exclude: /(node_modules|bower_components)/, loaders: [ 'babel' ] },
+      { test: /\.ts(x?)$/, loaders: [ 'babel-loader', 'ts-loader' ] },
       { test: /\.less$/, loaders: [ 'style', 'css', 'less' ] },
       { test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff' },
       { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/octet-stream' },
@@ -30,7 +31,7 @@ module.exports = {
       'scripts': path.join(__dirname, 'app', 'scripts'),
       'styles': path.join(__dirname, 'app', 'styles')
     },
-    extensions: ['', '.js', '.jsx']
+    extensions: [ '', '.js', '.jsx', '.ts', '.tsx' ]
   },
   plugins: []
 };

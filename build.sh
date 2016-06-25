@@ -49,14 +49,22 @@ views() {
 }
 
 images() {
-    mkdir -p "public"
-    cp $DIR/app/icons/* "public/"
+    type=$1
+
+    case $type in
+    *)      output="$DIR/public/";;
+    dist)   output="$DIR/dist/public/";;
+    esac
+
+    b_log "Copying images"
+    mkdir -p $output
+    cp $DIR/app/icons/* $output
     b_log "Copied images"
 }
 
 dist:babel() {
     b_log "Starting compiling server with Babel"
-    $BABEL "$DIR/lib" --out-dir "$DIR/dist/lib" -q -s true
+    $BABEL "$DIR/lib" --out-dir "$DIR/dist/lib" -q
     b_log "Finished Babel"
 }
 
@@ -64,7 +72,6 @@ dist:copy() {
     b_log "Copying assets and misc. files"
     mkdir -p $DIR/dist/{public,lib}
     cp $DIR/package.json $DIR/app/misc/**/* $DIR/dist/
-    cp $DIR/app/favicon.ico $DIR/dist/public/
     cp $DIR/lib/**/*.json $DIR/dist/lib
     b_log "Finished copying"
 }
@@ -78,6 +85,7 @@ dist:install() {
 
 dist() {
     b_log "Making distribution package"
+    images dist &
     webpack dist &
     dist:babel &
     views dist &
@@ -110,7 +118,7 @@ lib2 () {
 build_dev() {
     webpack dev &
     views dev &
-    images &
+    images dev &
 }
 
 watch_dev() {
@@ -120,11 +128,11 @@ watch_dev() {
 
 run() {
     b_log "Running application"
-    node . | $BUNYAN -o short
+    node . $@ | $BUNYAN -o short
 }
 
 run_watch() {
-    run &
+    run $@ &
     watch_dev &
 }
 
@@ -185,8 +193,8 @@ lib2)           lib2 ;;
 
 build_dev)      build_dev ;;
 watch_dev)      watch_dev ;;
-run)            run ;;
-run_watch)      run_watch ;;
+run)            run $@ ;;
+run_watch)      run_watch $@ ;;
 deploy)         deploy ;;
 
 help)           help ;;

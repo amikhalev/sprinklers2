@@ -1,0 +1,72 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "node/node.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "bluebird/bluebird.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "whatwg-fetch/whatwg-fetch.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-global.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-addons-create-fragment.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-addons-css-transition-group.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-dom.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-addons-pure-render-mixin.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-addons-linked-state-mixin.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-addons-transition-group.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-addons-test-utils.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-addons-perf.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react/react-addons-update.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react-bootstrap/react-bootstrap.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "redux-actions/redux-actions.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "redux/redux.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react-router/react-router.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "react-router/history.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    },
+    "classnames/classnames.d.ts": {
+      "commit": "6052959591c9bc6f8463c58220965c7030ba934d"
+    }
+  }
+}
